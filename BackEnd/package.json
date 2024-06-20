@@ -1,0 +1,11 @@
+{
+  "name": "back_plataforma_aprendizaje",
+  "version": "1.0.0",
+  "description": "BackEnd del proyecto Grupo 6 Plataforma de Aprendizaje",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ricardo, Esteban, Camilo",
+  "license": "ISC"
+}
