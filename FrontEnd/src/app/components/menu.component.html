@@ -1,0 +1,16 @@
+<div class="d-flex flex-wrap w-100 h-100">
+    <div class="d-flex w-100 justify-content-center">
+        <ul class="list-group w-75">
+            <li class="list-group-item text-start" for *ngFor="let menu of menuArray"
+                [routerLink]="menu.route" 
+                routerLinkActive="active">
+                <i [className]="menu.icon"></i>{{menu.title}}
+            </li>
+        </ul>
+    </div>
+
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <h4 class="text-center text-secondary text-wrap text-capitalize mb-3">Plataforma de apredizaje en linea</h4>
+        <img src="./logo.png" alt="logo" loading="lazy" width="150px" height="150px">
+    </div>
+</div>
