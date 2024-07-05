@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 
 interface Menu {
   route: string;
@@ -39,5 +39,13 @@ export class MenuComponent {
       title: 'Tutores',
       icon: 'bi bi-rocket-takeoff-fill me-3'
     },
-  ]
+  ];
+
+  public user = signal({
+    name: 'Pedro',
+    lastName: 'Perez',
+    role: 'Estudiante'
+  });
+
+  public completeName = computed(()=> `${this.user().name} ${this.user().lastName}`)
 }
