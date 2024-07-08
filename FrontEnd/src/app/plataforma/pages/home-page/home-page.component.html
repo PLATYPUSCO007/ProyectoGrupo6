@@ -6,7 +6,10 @@
         <hr>
         <h5>Mis Cursos</h5>
         <div class="d-flex flex-wrap justify-content-between w-100">
-            <div class="card" style="width: 40%;">
+            <div style="width: 40%;" *ngFor="let curso of cursos">
+                <app-card [curso]="curso" [isRegistered]=true/>
+            </div>    
+            <!-- <div class="card" style="width: 40%;">
                 <img src="./square.svg" alt="imgCourse" class="card-img-top" >
                 <div class="card-body">
                     <h5 class="card-title">Node JS</h5>
@@ -25,7 +28,7 @@
                     </p>
                     <button class="btn btn-success">Ir <i class="ms-2 bi bi-arrow-right"></i></button>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>

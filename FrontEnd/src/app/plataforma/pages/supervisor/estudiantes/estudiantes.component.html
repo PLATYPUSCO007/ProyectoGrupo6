@@ -1,0 +1,76 @@
+<div class="d-flex flex-column align-items-center w-100 mt-3">
+     <div class="d-flex flex-column align-items-center justify-content-center w-100 mb-3">
+        <div class="w-100">
+            <h3 class="text-center">Crear usuario</h3>
+            <hr />
+        </div>
+        <div class="d-flex w-100">
+            <form class="w-100" [formGroup]="formEstudiante">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <input type="text" class="form-control mb-2 w-25 me-3" placeholder="Cedula"
+                        formControlName="cedula">
+                    <input type="text" class="form-control mb-2 w-50" placeholder="Nombre(s)"
+                        formControlName="nombre">
+                    <input type="text" class="form-control mb-2 w-50 me-3" placeholder="Apellido(s)"
+                        formControlName="apellido">
+                    <input type="text" class="form-control mb-2 w-25" placeholder="Telefono"
+                        formControlName="telefono">
+                    <input type="text" class="form-control mb-2 w-50 me-3" placeholder="Email"
+                        formControlName="email">
+                    <input type="text" class="form-control mb-2 w-25" placeholder="Matricula"
+                        formControlName="matricula">
+                    <input type="text" class="form-control mb-2 w-25 me-3" name="codigoActivacion" 
+                        formControlName="codigo_activacion" hidden>
+                    <select class="form-control mb-3 w-25 me-3" formControlName="estado">
+                        <option value="">-- Estado --</option>
+                        <option value="" *ngFor="let estado of estadoEstudiante" [value]="estado">{{estado | titlecase}}</option>
+                    </select>
+                    <select class="form-control mb-3 w-25" formControlName="supervisor">
+                        <option value="">-- Supervisor --</option>
+                    </select>
+                    <button *ngIf="!isEdit(); else edit" class="btn btn-success w-75" (click)="createEstudiante()">Crear</button>
+                    <ng-template #edit><button class="btn btn-primary w-75" (click)="sendEditEstudiante()">Editar</button></ng-template>
+                </div>
+            </form>
+        </div>
+     </div>
+     <!-- <pre>
+        {{formEstudiante.value | json}}
+     </pre> -->
+     <div class="d-flex flex-column w-50 align-items-center ms-3">
+        <h3>Lista de Usuarios</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Cedula</th>
+                    <th scope="col">Nombre(s)</th>
+                    <th scope="col">Apellido(s)</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">telefono</th>
+                    <th scope="col">Supervisor</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let estudiante of listEstudiantes; let i=index">
+                    <td>{{i + 1}}</td>
+                    <td>{{estudiante.cedula}}</td>
+                    <td>{{estudiante.nombre}}</td>
+                    <td>{{estudiante.apellido}}</td>
+                    <td>{{estudiante.email}}</td>
+                    <td>{{estudiante.telefono}}</td>
+                    <td>{{estudiante.supervisor}}</td>
+                    <td>{{estudiante.estado | titlecase}}</td>
+                    <td>
+                        <div class="d-flex">
+                            <button class="btn btn-primary me-1" (click)="editEstudiante(estudiante)"><i class="bi bi-pencil-fill"></i></button>
+                            <button class="btn btn-danger" (click)="deleteEstudiante()"><i class="bi bi-x-circle-fill"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+     </div>
+</div>

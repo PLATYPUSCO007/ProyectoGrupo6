@@ -6,6 +6,9 @@ import { CursosPageComponent } from './pages/cursos-page/cursos-page.component';
 import { EstudiantesPageComponent } from './pages/estudiantes-page/estudiantes-page.component';
 import { SupervisoresPageComponent } from './pages/supervisores-page/supervisores-page.component';
 import { TutoresPageComponent } from './pages/tutores-page/tutores-page.component';
+import { EstudiantesComponent } from './pages/supervisor/estudiantes/estudiantes.component';
+import { CursosComponent } from './pages/supervisor/cursos/cursos.component';
+import { DashboardsComponent } from './pages/supervisor/dashboards/dashboards.component';
 
 const routes: Routes = [{
   path: '',
@@ -21,10 +24,23 @@ const routes: Routes = [{
     component: EstudiantesPageComponent
   },{
     path: 'supervisor',
-    component: SupervisoresPageComponent
+    component: SupervisoresPageComponent,
+    children: [{
+      path: 'crudEstudiantes',
+      component: EstudiantesComponent
+    },{
+      path: 'crudCursos',
+      component: CursosComponent
+    },{
+      path: 'dashboards',
+      component: DashboardsComponent
+    },{
+      path: '**',
+      redirectTo: 'crudEstudiantes'
+    }]
   },{
     path: 'tutores',
-    component: TutoresPageComponent
+    component: TutoresPageComponent,
   },{
     path: '**',
     redirectTo: 'home'
