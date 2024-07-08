@@ -1,0 +1,2 @@
+start cmd.exe /k "cd /d C:\Program Files\MongoDB\Server\7.0\bin && mongod.exe --dbpath C:\estudio\BootCamp\PROYECTOGRUPO6\BackEnd\bd_aprendizajeenlinea"
+start cmd.exe /k "cd /d C:\estudio\BootCamp\PROYECTOGRUPO6\BackEnd && npm run start:watch"
