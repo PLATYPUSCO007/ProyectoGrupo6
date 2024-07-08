@@ -1,15 +1,6 @@
 import User from "../models/user.js"
 import bcrypt from "bcrypt";
 import { createToken } from "../services/jwt.js"
-import fs from "fs";
-import path from "path";
-
-// Acciones de prueba
-export const testUser = (req, res) => {
-  return res.status(200).send({
-    message: "Mensaje enviado desde el controlador: user.js"
-  });
-}
 
 // Método para Registrar de usuarios
 export const register = async (req, res) => {
@@ -18,7 +9,7 @@ export const register = async (req, res) => {
     let params = req.body;
 
     // Validaciones: verificamos que los datos obligatorios estén presentes
-    if (!params.cedula || !params.name || !params.last_name || !params.phone || !params.email || !params.password){
+    if (!params.cedula || !params.name || !params.last_name || !params.telefono || !params.email || !params.password){
       return res.status(400).json({
         status: "error",
         message: "Faltan datos por enviar"
@@ -122,7 +113,7 @@ export const login = async (req, res) => {
         id: user._id,
         name: user.name,
         last_name: user.last_name,
-        phone: user.phone,
+        telefono: user.telefono,
         email: user.email,
         cedula: user.cedula,
         created_at: user.created_at
@@ -265,3 +256,32 @@ export const updateUser = async (req, res) => {
   }
 }
 
+// Método guardar progreso del usuario
+/*export const counters = async (req, res) => {
+  try {
+    // Obtener el id del usuarios autenticado desde el token
+    let userId = req.user.userId;
+
+    // En caso de llegar el id del usuario en los parametros (por la url) se toma como prioritario
+    if (req.params.id){
+      userId = req.params.id;
+    }
+
+     // Si no encuentra al usuario
+     if (!user){
+      return res.status(404).send({
+        status: "error",
+        message: "Usuario no encontrado"
+      });
+    }
+
+    //contador actividades
+  } catch {
+    console.log("Error al actualizar los datos del usuario", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al actualizar los datos del usuario"
+    });
+  }
+}
+*/
