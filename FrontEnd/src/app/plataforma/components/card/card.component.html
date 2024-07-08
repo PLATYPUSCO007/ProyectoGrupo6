@@ -1,0 +1,18 @@
+<div class="card">
+    <img [src]="curso.img" alt="imgCourse" class="card-img-top" >
+    <div class="card-body">
+        <h5 class="card-title">{{curso.title}}</h5>
+        <p class="card-text lh-sm">
+            {{curso.description}}
+        </p>
+        <div *ngIf="isRegistered; else info">
+            <button class="btn btn-success">Ir <i class="ms-2 bi bi-arrow-right"></i></button>
+        </div>
+        <ng-template #info>
+            <div class="d-flex justify-content-evenly">
+                <button class="btn btn-success">Ver Mas...<i class="ms-2 bi bi-plus"></i></button>
+                <button class="btn btn-primary">Aplicar<i class="ms-2 bi bi-check-lg"></i></button>
+            </div>
+        </ng-template>
+    </div>
+</div>
