@@ -70,3 +70,20 @@ export const register = async (req, res) => {
     });
   }
 }
+
+export const getAll = async (req, res)=>{
+  try{
+    const estudiantes = await Estudiante.find().populate('id_user').exec();
+    return res.status(200).json({
+      status: "success",
+      message: "Estudiantes encontrados",
+      estudiantes
+    });
+  }catch(e){
+    console.log("Error al consultar Estudiantes: ", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al consultar Estudiantes",
+    });
+  }
+}
