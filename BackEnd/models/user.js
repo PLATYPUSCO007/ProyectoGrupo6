@@ -14,7 +14,7 @@ const UserSchema = Schema ({
     type: String,
     required: true
   },
-  telfono: {
+  telefono: {
     type: String,
     required: true
   },
