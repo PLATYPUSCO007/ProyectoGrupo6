@@ -19,13 +19,12 @@ const EstudianteSchema = Schema({
   },
   estado: {
     type: String,
-    default: "Registrado",
+    default: "registrado",
     required: true
   },
   supervisor: {
     type: Schema.ObjectId,
-    default: "Supervisor",
-    required: true
+    ref: "Supervisor"
   },
   created_at: {
     type: Date,
