@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginService } from '../../services/loginService/login.service';
 import { delay, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-loguin',
@@ -10,6 +11,9 @@ import { Router } from '@angular/router';
   styleUrl: './loguin.component.css'
 })
 export class LoguinComponent{
+
+  @ViewChild('toastLoguin')
+  public toastLoguin?: SwalComponent;
 
   private fb: FormBuilder = inject(FormBuilder);
   private loguinService = inject(LoginService);
@@ -39,6 +43,7 @@ export class LoguinComponent{
           this.router.navigateByUrl('/plataforma')
         },
         error: (e)=>{
+          this.toastLoguin!.fire();
           this.formLoguin.enable();
           console.log(e);
         }

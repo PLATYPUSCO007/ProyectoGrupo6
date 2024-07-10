@@ -32,6 +32,17 @@
             <div class="card-footer text-center">
                 <button class="btn btn-primary" (click)="logUser()">Entrar</button>
                 <p class="text-info mt-3"><a [routerLink]="['/sesion/active']"> Activar codigo de usuario </a></p>
+                <swal 
+                    #toastLoguin 
+                    title="¡AVISO!" 
+                    text="Revisa las credenciales."
+                    [toast]="true"
+                    [timer]="2000"
+                    [showConfirmButton]="false"
+                    [timerProgressBar]="true"
+                    position="top"
+                    icon="warning">
+                </swal>
             </div>
         </form>
     </div>
