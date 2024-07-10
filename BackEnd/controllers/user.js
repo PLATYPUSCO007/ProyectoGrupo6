@@ -1,37 +1,59 @@
-import User from "../models/user.js"
+import User from "../models/user.js";
 import bcrypt from "bcrypt";
-import { createToken } from "../services/jwt.js"
+import { createToken } from "../services/jwt.js";
+import {RoleService} from "../services/role.service.js";
 
 // Método para Registrar de usuarios
 export const register = async (req, res) => {
   try {
     // Recoger datos de la petición
     let params = req.body;
+    let { role } = req.params;
+    console.log("ROLE ", role);
 
     // Validaciones: verificamos que los datos obligatorios estén presentes
-    if (!params.cedula || !params.name || !params.last_name || !params.telefono || !params.email || !params.password){
+    if (
+      !params.cedula ||
+      !params.name ||
+      !params.last_name ||
+      !params.telefono ||
+      !params.email ||
+      !params.password
+    ) {
       return res.status(400).json({
         status: "error",
-        message: "Faltan datos por enviar"
+        message: "Faltan datos por enviar",
       });
     }
 
+    // Desestructurar datos de usuario
+    const { cedula, name, last_name, telefono, email, password, ...newRole } = params;
+    
+    const userData = {
+      cedula: cedula,
+      name: name,
+      last_name: last_name,
+      telefono: telefono,
+      email: email,
+      password: password,
+    };
+
     // Crear una instancia del modelo User con los datos validados
-    let user_to_save = new User(params);
+    let user_to_save = new User(userData);
 
     // Buscar si ya existe un usuario con el mismo email o nick
     const existingUser = await User.findOne({
       $or: [
         { email: user_to_save.email.toLowerCase() },
-        { cedula: user_to_save.cedula.toLowerCase() }
-      ]
+        { cedula: user_to_save.cedula.toLowerCase() },
+      ],
     });
 
     // Si encuentra un usuario, devuelve un mensaje indicando que ya existe
-    if(existingUser) {
+    if (existingUser) {
       return res.status(409).json({
         status: "error",
-        message: "!El usuario ya existe!"
+        message: "!El usuario ya existe!",
       });
     }
 
@@ -43,6 +65,11 @@ export const register = async (req, res) => {
     // Guardar el usuario en la base de datos
     await user_to_save.save();
 
+    // Crear rol
+    newRole.id_user = user_to_save.id;
+
+    const roleSave = await RoleService.createRole(role, newRole);
+
     // Devolver respuesta exitosa y el usuario registrado
     return res.status(201).json({
       status: "created",
@@ -52,41 +79,40 @@ export const register = async (req, res) => {
         name: user_to_save.name,
         last_name: user_to_save.last_name,
         cedula: user_to_save.cedula,
-      }
+      },
+      role: roleSave,
     });
-
   } catch (error) {
     console.log("Error en registro de usuario:", error);
     return res.status(500).json({
       status: "error",
-      message: "Error en registro de usuarios"
+      message: "Error en registro de usuarios",
     });
   }
-}
+};
 
 // Método para autenticar usuarios
 export const login = async (req, res) => {
   try {
-
     // Recoger los parámetros del body
     let params = req.body;
 
     // Validar si llegaron el email y password
-    if (!params.email || !params.password){
+    if (!params.email || !params.password) {
       return res.status(400).send({
         status: "error",
-        message: "Faltan datos por enviar"
+        message: "Faltan datos por enviar",
       });
     }
 
     // Buscar en la BD si existe el email que nos envió el usuario
-    const user = await User.findOne({ email: params.email.toLowerCase()});
+    const user = await User.findOne({ email: params.email.toLowerCase() });
 
     // Si no existe el user
     if (!user) {
       return res.status(404).json({
         status: "error",
-        message: "Usuario no encontrado"
+        message: "Usuario no encontrado",
       });
     }
 
@@ -97,9 +123,11 @@ export const login = async (req, res) => {
     if (!validPassword) {
       return res.status(401).json({
         status: "error",
-        message: "Contraseña incorrecta"
+        message: "Contraseña incorrecta",
       });
     }
+
+    const role = await RoleService.findRole(user.id);
 
     // Generar token de autenticación
     const token = createToken(user);
@@ -116,18 +144,18 @@ export const login = async (req, res) => {
         telefono: user.telefono,
         email: user.email,
         cedula: user.cedula,
-        created_at: user.created_at
-      }
+        created_at: user.created_at,
+      },
+      role,
     });
-
   } catch (error) {
     console.log("Error en el login del usuario: ", error);
     return res.status(500).send({
       status: "error",
-      message: "Error en el login del usuario"
+      message: "Error en el login del usuario",
     });
   }
-}
+};
 
 // Método para mostrar el perfil del usuario
 export const profile = async (req, res) => {
@@ -139,39 +167,40 @@ export const profile = async (req, res) => {
     if (!req.user || !req.user.userId) {
       return res.status(404).send({
         status: "error",
-        message: "Usuario no autenticado"
+        message: "Usuario no autenticado",
       });
     }
 
     // Buscar al usuario en la BD, excluimos la contraseña, rol, versión.
-    const userProfile = await User.findById(userId).select('-password -role -__v -email');
+    const userProfile = await User.findById(userId).select(
+      "-password -role -__v -email",
+    );
 
     // Verificar si el usuario existe
     if (!userProfile) {
       return res.status(404).send({
         status: "error",
-        message: "Usuario no encontrado"
+        message: "Usuario no encontrado",
       });
     }
 
-    // Información de seguimiento - (req.user.userId = Id del usuario autenticado) 
+    // Información de seguimiento - (req.user.userId = Id del usuario autenticado)
     const followInfo = await followThisUser(req.user.userId, userId);
 
     // Devolver la información del perfil del usuario
     return res.status(200).json({
       status: "success",
       user: userProfile,
-      followInfo
+      followInfo,
     });
-
   } catch (error) {
     console.log("Error al botener el perfil del usuario:", error);
     return res.status(500).send({
       status: "error",
-      message: "Error al obtener el perfil del usuario"
+      message: "Error al obtener el perfil del usuario",
     });
   }
-}
+};
 
 // Método para actualizar los datos del usuario
 export const updateUser = async (req, res) => {
@@ -179,12 +208,12 @@ export const updateUser = async (req, res) => {
     // Recoger información del usuario a actualizar
     let userIdentity = req.user;
     let userToUpdate = req.body;
-    
+
     // Validar que los campos necesarios estén presentes
     if (!userToUpdate.email || !userToUpdate.cedula) {
       return res.status(400).send({
         status: "error",
-        message: "¡Los campos email y cedula son requeridos!"
+        message: "¡Los campos email y cedula son requeridos!",
       });
     }
 
@@ -196,25 +225,23 @@ export const updateUser = async (req, res) => {
     const users = await User.find({
       $or: [
         { email: userToUpdate.email.toLowerCase() },
-        { cedula: userToUpdate.cedula.toLowerCase() }
-      ]
+        { cedula: userToUpdate.cedula.toLowerCase() },
+      ],
     }).exec();
 
     // Verificar si el usuario está duplicado y evitar conflicto
-    const isDuplicateUser = users.some(user => {
+    const isDuplicateUser = users.some((user) => {
       return user && user._id.toString() !== userIdentity.userId;
     });
 
     if (isDuplicateUser) {
       return res.status(400).send({
         status: "error",
-        message: "Solo se puede modificar los datos del usuario logueado."
+        message: "Solo se puede modificar los datos del usuario logueado.",
       });
     }
 
     //Verificar Rol de usuaio
-   
-
 
     // Cifrar la contraseña si se proporciona
     if (userToUpdate.password) {
@@ -224,7 +251,7 @@ export const updateUser = async (req, res) => {
       } catch (hashError) {
         return res.status(500).send({
           status: "error",
-          message: "Error al cifrar la contraseña"
+          message: "Error al cifrar la contraseña",
         });
       }
     } else {
@@ -232,12 +259,16 @@ export const updateUser = async (req, res) => {
     }
 
     // Buscar y Actualizar el usuario a modificar en la BD
-    let userUpdated = await User.findByIdAndUpdate(userIdentity.userId, userToUpdate, { new: true});
+    let userUpdated = await User.findByIdAndUpdate(
+      userIdentity.userId,
+      userToUpdate,
+      { new: true },
+    );
 
     if (!userUpdated) {
       return res.status(400).send({
         status: "error",
-        message: "Error al actualizar el usuario"
+        message: "Error al actualizar el usuario",
       });
     }
 
@@ -245,16 +276,16 @@ export const updateUser = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "¡Usuario actualizado correctamente!",
-      user: userUpdated
+      user: userUpdated,
     });
   } catch (error) {
     console.log("Error al actualizar los datos del usuario", error);
     return res.status(500).send({
       status: "error",
-      message: "Error al actualizar los datos del usuario"
+      message: "Error al actualizar los datos del usuario",
     });
   }
-}
+};
 
 // Método guardar progreso del usuario
 /*export const counters = async (req, res) => {

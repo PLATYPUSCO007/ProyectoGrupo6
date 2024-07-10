@@ -9,7 +9,6 @@ const SupervisorSchema = Schema ({
   create_at: {
     type: Date,
     ref: "Created_at",
-    required: true
   }
 });
 

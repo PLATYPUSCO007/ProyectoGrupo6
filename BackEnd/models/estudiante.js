@@ -12,7 +12,7 @@ const EstudianteSchema = Schema({
     default: " ",
     required: true
   },
-  codigo_actv: {
+  codigo_activacion: {
     type: String,
     default: " ",
     required: true
