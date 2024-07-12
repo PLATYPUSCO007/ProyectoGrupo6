@@ -1,12 +1,11 @@
 // Añadir pluggin de paginación
-CursoSchema.plugin(mongoosePaginate);
+/*CursoSchema.plugin(mongoosePaginate);*/
 
 const mongoose = require("mongoose");
 
 const CursoSchema = new mongoose.Schema({
   id_usuario: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
   },
   titulo: {
     type: String,
