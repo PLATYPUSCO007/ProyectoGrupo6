@@ -26,9 +26,23 @@ const UserSchema = Schema ({
     type: String,
     required: true
   },
+  estado: {
+    type: String,
+    required: true
+  },
+  id_curso: {
+    type: String,
+    default: " "
+  },
+  rol: {
+    type: String,
+    required: true,
+    enum : ['estudiante','supervisor', 'tutor'],
+    default: "estudiante"
+  },
   created_at: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   }
 });
 

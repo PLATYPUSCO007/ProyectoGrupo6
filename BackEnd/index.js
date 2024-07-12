@@ -3,7 +3,6 @@ import connection from "./database/connection.js";
 import express, { json, urlencoded } from "express";
 import cors from "cors";
 import UserRoutes from './routes/user.js'
-import EstudianteRoutes from './routes/estudiante.js'
 
 //Conexion BD
 connection();
@@ -21,7 +20,7 @@ app.use(urlencoded({extended: true}));
 
 //Rutas
 app.use('/api/user', UserRoutes);
-app.use('/api/estudiante', EstudianteRoutes);
+
 
 /*app.use('/api/curso', )*/
 
