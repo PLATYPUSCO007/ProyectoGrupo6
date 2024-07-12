@@ -1,4 +1,9 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { LoginService } from '../login/services/loginService/login.service';
+import { Router } from '@angular/router';
+import { User } from '../interfaces/Roles.interface';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import Swal from 'sweetalert2';
 
 interface Menu {
   route: string;
@@ -41,11 +46,45 @@ export class MenuComponent {
     },
   ];
 
-  public user = signal({
-    name: 'Pedro',
-    lastName: 'Perez',
-    role: 'Estudiante'
+  @ViewChild('toastLoguin')
+  public toastLoguin?: SwalComponent;
+
+  public user = signal<User | null >(null);
+  public completeName = computed(()=> `${this.user()?.name} ${this.user()?.last_name}`);
+  public effectLoguin = effect(()=>{
+    Swal.fire({
+      title: 'SESION INICIADA',
+      toast: true,
+      timer: 2000,
+      showConfirmButton: false,
+      timerProgressBar: true,
+      position: "top",
+      icon: "success",
+      text: `Bienvenido ${this.user()?.name} ${this.user()?.last_name}`,
+    })
   });
 
-  public completeName = computed(()=> `${this.user().name} ${this.user().lastName}`)
+  private loginService = inject(LoginService);
+  private router = inject(Router);
+
+
+  get UserLogued(){
+    return this.loginService.userSession;
+  }
+
+  constructor(){
+    this.user.update(()=>this.UserLogued);
+  }
+
+  closeSession(){
+    this.loginService.logOut()
+      .subscribe({
+        next: ()=>{
+          this.router.navigateByUrl('/sesion/loguin');
+        },
+        error: (e)=>{
+          console.log(`Error al cerrar sesion, ${e}`);
+        }
+      })
+  }
 }

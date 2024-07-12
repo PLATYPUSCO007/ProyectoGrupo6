@@ -2,8 +2,9 @@ import { AfterViewInit, Directive, ElementRef, Input, OnChanges } from '@angular
 import { ValidationErrors } from '@angular/forms';
 
 enum listErrors {
-  'required' = 'Este valor es requerido.',
+  'required' = 'Este campo es requerido.',
   'minlength' = 'Se requieren mínimo x caracteres.',
+  'email' = 'El valor debe ser un email',
 }
 
 @Directive({
@@ -22,8 +23,6 @@ export class ErrorsDirective implements OnChanges {
   }
 
   changeError(){
-    console.log(this.errorField);
-    
     if (!this.errorField || this.isPristine) {
       this.elementRef.nativeElement.innerText = '';
       return;

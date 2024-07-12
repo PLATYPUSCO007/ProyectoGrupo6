@@ -16,7 +16,7 @@ import { SideMenuComponent } from '../shared/side-menu/side-menu.component';
 import { CodigoActivacionDirective } from './directives/codigo-activacion.directive';
 import { CursosComponent } from './pages/supervisor/cursos/cursos.component';
 import { DashboardsComponent } from './pages/supervisor/dashboards/dashboards.component';
-
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @NgModule({
   declarations: [
@@ -26,18 +26,19 @@ import { DashboardsComponent } from './pages/supervisor/dashboards/dashboards.co
     SupervisoresPageComponent,
     TutoresPageComponent,
     HomePageComponent,
-    MenuComponent,
     CardComponent,
     EstudiantesComponent,
     SideMenuComponent,
     CodigoActivacionDirective,
     CursosComponent,
     DashboardsComponent,
+    MenuComponent
   ],
   imports: [
     CommonModule,
     PlataformaRoutingModule,
     ReactiveFormsModule,
+    SweetAlert2Module.forChild(),
   ]
 })
 export class PlataformaModule { }

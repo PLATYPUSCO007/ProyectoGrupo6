@@ -7,7 +7,7 @@ import { LoguinComponent } from './pages/loguin/loguin.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ErrorsDirective } from './directives/errors.directive';
 import { ActiveCodeComponent } from './pages/active-code/active-code.component';
-
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @NgModule({
   declarations: [
@@ -20,6 +20,7 @@ import { ActiveCodeComponent } from './pages/active-code/active-code.component';
     CommonModule,
     LoginRoutingModule,
     ReactiveFormsModule,
+    SweetAlert2Module.forChild(),
   ]
 })
 export class LoginModule { }
