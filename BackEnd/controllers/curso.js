@@ -1,7 +1,7 @@
 import Publication from "../models/publication.js"
 import fs from "fs";
 import path from "path";
-import { followUserIds } from "../services/followServices.js";
+
 
 // Método para hacer una publicación
 export const savePublication = async (req, res) => {

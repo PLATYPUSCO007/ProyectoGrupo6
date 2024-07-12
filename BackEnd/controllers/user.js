@@ -147,8 +147,8 @@ export const login = async (req, res) => {
         cedula: user.cedula,
         rol: user.rol,
         created_at: user.created_at,
+        role: role.isEstudiante || role.isSupervisor,
       },
-      role,
     });
   } catch (error) {
     console.log("Error en el login del usuario: ", error);
