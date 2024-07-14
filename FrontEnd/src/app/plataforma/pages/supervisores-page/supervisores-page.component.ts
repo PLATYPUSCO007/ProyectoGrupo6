@@ -18,6 +18,14 @@ export class SupervisoresPageComponent {
       route: '/plataforma/supervisor/crudCursos'
     },
     {
+      title: 'Paquetes',
+      route: '/plataforma/supervisor/crudPaquetes'
+    },
+    {
+      title: 'Modulos',
+      route: '/plataforma/supervisor/crudModulos'
+    },
+    {
       title: 'Dashboards',
       route: '/plataforma/supervisor/dashboards'
     },
