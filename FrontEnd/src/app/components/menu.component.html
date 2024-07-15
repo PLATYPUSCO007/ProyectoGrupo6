@@ -14,8 +14,9 @@
     <div class="d-flex w-100 justify-content-center">
         <ul class="list-group w-75">
             <li class="list-group-item text-start" *ngFor="let menu of menuArray"
-                [routerLink]="menu.route" 
-                routerLinkActive="active">
+            [routerLink]="menu.route" 
+            routerLinkActive="active"
+            [hidden]="menu.profile !== user()?.name && !!menu.profile">
                 <i [className]="menu.icon"></i>{{menu.title}}
             </li>
             <li class="list-group-item text-start bg-danger text-white" 
