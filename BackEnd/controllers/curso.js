@@ -1,6 +1,4 @@
-import curso from "../models/curso.js"
-import fs from "fs";
-import path from "path";
+import Curso from "../models/curso.js"
 
 
 // Método para hacer una publicación
@@ -35,21 +33,24 @@ export const saveCurso = async (req, res) => {
     // Crear objeto 
     let newCurso = new Curso(cursoData);
 
-     // Buscar si ya existe un usuario con el mismo email o nick
-     const existingCurso = await User.findOne({
+    // Buscar si ya existe un usuario con el mismo email o nick
+    const existingCurso = await Curso.findOne({
       $or: [
         { titulo: newCurso.titulo.toLowerCase() }
       ],
     });
 
-    // Si encuentra un curso, devuelve un mensaje indicando que ya existe
-    if (existingUser) {
+    // Si encuentra un usuario, devuelve un mensaje indicando que ya existe
+    if (existingCurso) {
       return res.status(409).json({
         status: "error",
-        message: "!El titulo del curso ya existe!",
+        message: "!El curso ya existe!",
       });
     }
 
+    // Guardar el curso en la base de datos
+    await newCurso.save();
+    
     // Verificar si se guardó correctamente en la BD
     if(!newCurso) {
       return res.status(500).send({
@@ -58,12 +59,164 @@ export const saveCurso = async (req, res) => {
       });
     }
 
+    // Devolver respuesta exitosa y el usuario registrado
+    return res.status(201).json({
+      status: "created",
+      message: "Curso agregado con éxito",
+      user: {
+        id: newCurso.id,
+        titulo: newCurso.titulo,
+        categoria: newCurso.categoria,
+        descripcion: newCurso.descripcion,
+        duracion: newCurso.duracion,
+        imagen: newCurso.imagen
+      },
+    });
+
   } catch (error) {
     console.log("Error al crear la publicación:", error);
     return res.status(500).send({
       status: "error",
-      message: "Error al crear el curso"
+      message: "Error al crear el curso" 
     });
   }
 }
 
+//Método para actualizar los datos del curso
+/*export const updateCurso = async (req, res) => {
+  try {
+    // Recoger información del usuario a actualizar
+    let cursoIdentity = req.curso;
+    let cursoToUpdate = req.body;
+
+    // Validar que los campos necesarios estén presentes
+    if (!cursoToUpdate.titulo || !cursoToUpdate.cedula) {
+      return res.status(400).send({
+        status: "error",
+        message: "¡Los campos email y cedula son requeridos!",
+      });
+    }
+
+    // Eliminar campos sobrantes
+    delete userToUpdate.iat;
+    delete userToUpdate.exp;
+
+    // Comprobar si el usuario ya existe
+    const users = await User.find({
+      $or: [
+        { email: userToUpdate.email.toLowerCase() },
+        { cedula: userToUpdate.cedula.toLowerCase() },
+      ],
+    }).exec();
+
+    // Verificar si el usuario está duplicado y evitar conflicto
+    const isDuplicateUser = users.some((user) => {
+      return user && user._id.toString() !== userIdentity.userId;
+    });
+
+    if (isDuplicateUser) {
+      return res.status(400).send({
+        status: "error",
+        message: "Solo se puede modificar los datos del usuario logueado.",
+      });
+    }
+
+    // Cifrar la contraseña si se proporciona
+    if (userToUpdate.password) {
+      try {
+        let pwd = await bcrypt.hash(userToUpdate.password, 10);
+        userToUpdate.password = pwd;
+      } catch (hashError) {
+        return res.status(500).send({
+          status: "error",
+          message: "Error al cifrar la contraseña",
+        });
+      }
+    } else {
+      delete userToUpdate.password;
+    }
+
+    // Buscar y Actualizar el usuario a modificar en la BD
+    let userUpdated = await User.findByIdAndUpdate(
+      userIdentity.userId,
+      userToUpdate,
+      { new: true },
+    );
+
+    if (!userUpdated) {
+      return res.status(400).send({
+        status: "error",
+        message: "Error al actualizar el usuario",
+      });
+    }
+
+    // Devolver respuesta exitosa con el usuario actualizado
+    return res.status(200).json({
+      status: "success",
+      message: "¡Usuario actualizado correctamente!",
+      user: userUpdated,
+    });
+  } catch (error) {
+    console.log("Error al actualizar los datos del usuario", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al actualizar los datos del usuario",
+    });
+  }
+};*/
+
+export const addUserToCurso = async (req, res) => {
+  try {
+    // Obtener el ID del curso desde los parámetros de la URL
+    let cursoId = req.params.id;
+    
+    // Obtener el ID del usuario desde el cuerpo de la solicitud
+    let { id_usuario } = req.body;
+
+    // Validar que el ID del usuario esté presente
+    if (!id_usuario) {
+      return res.status(400).send({
+        status: "error",
+        message: "Falta el ID del usuario a añadir",
+      });
+    }
+
+    // Buscar el curso por ID
+    let curso = await Curso.findById(cursoId);
+
+    // Verificar si el curso existe
+    if (!curso) {
+      return res.status(404).send({
+        status: "error",
+        message: "Curso no encontrado",
+      });
+    }
+
+    // Verificar si el usuario ya está en el curso
+    if (curso.id_usuario.includes(id_usuario)) {
+      return res.status(400).send({
+        status: "error",
+        message: "El usuario ya está en el curso",
+      });
+    }
+
+    // Agregar el usuario al array de usuarios del curso
+    curso.id_usuario.push(id_usuario);
+
+    // Guardar el curso actualizado
+    let cursoUpdated = await curso.save();
+
+    // Devolver respuesta exitosa con el curso actualizado
+    return res.status(200).json({
+      status: "success",
+      message: "¡Usuario agregado correctamente al curso!",
+      curso: cursoUpdated,
+    });
+  } catch (error) {
+    console.log("Error al agregar usuario al curso", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al agregar usuario al curso",
+    });
+  }
+};

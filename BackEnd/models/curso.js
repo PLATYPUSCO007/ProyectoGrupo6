@@ -1,29 +1,30 @@
 // Añadir pluggin de paginación
 /*CursoSchema.plugin(mongoosePaginate);*/
+import { Schema, model} from "mongoose";
 
-const mongoose = require("mongoose");
-
-const CursoSchema = new mongoose.Schema({
+const CursoSchema = Schema({
   id_usuario: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: [Schema.ObjectId],
+    ref: "User",
+    default: []
   },
   titulo: {
     type: String,
-    required: true,
+    required: true
   },
   categoria: {
-    type: String,
+    type: String
   },
   descripcion: {
     type: String,
-    required: true,
+    required: true
   },
   duracion: {
-    type: Number,
+    type: String
   },
   imagen: {
     type: String,
-    required: true,
+    required: true
   },
   created_at: {
     type: Date,

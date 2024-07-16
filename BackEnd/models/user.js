@@ -30,10 +30,10 @@ const UserSchema = Schema ({
     type: String,
     required: true
   },
-  id_curso: {
-    type: String,
-    default: " "
-  },
+  id_curso: [{
+    type: Schema.ObjectId,
+    ref: "Curso",
+  }],
   rol: {
     type: String,
     required: true,

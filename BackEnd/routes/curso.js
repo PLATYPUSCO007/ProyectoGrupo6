@@ -1,11 +1,12 @@
 // Importaciones
 import { Router } from "express";
 const router = Router();
-import { saveCurso } from "../controllers/curso.js";
+import { addUserToCurso, saveCurso } from "../controllers/curso.js";
 
 
 //Rutas
 router.post('/register', saveCurso);
+router.post('/addcurso/:id', addUserToCurso);
 
 // Exportar el Router
 export default router;
