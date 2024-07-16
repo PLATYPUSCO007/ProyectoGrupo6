@@ -1,1 +1,71 @@
-<p>cursos works!</p>
+<div class="d-flex flex-column w-100 mt-3">
+    <div class="d-flex flex-column w-100 justify-content-center">
+        <h3 class="text-center">Crear Curso</h3>
+        <hr>
+    </div>
+    <div class="d-flex w-100">
+        <form [formGroup]="formCursos">
+            <div class="d-flex flex-wrap w-100 justify-content-center">
+                <input type="text" class="form-control w-25 me-3 mb-3" placeholder="Titulo" formControlName="titulo">
+                <select class="form-control w-50 w-25 mb-3 me-3" formControlName="categoria">
+                    <option value="">-- Seleccione una categoria --</option>
+                    <option *ngFor="let cat of listCategorias" [value]="cat">{{cat | titlecase}}</option>
+                </select>
+                <label for="descp" class="form-label w-75">Descripcion del curso</label>
+                <textarea name="descp" class="form-control w-75 me-3 mb-3" cols="15" rows="5" placeholder="Ingrese una descripcion del curso"
+                    formControlName="descripcion">
+                </textarea>
+                <input type="number" class="form-control w-25 me-3" placeholder="Duracion" formControlName="duracion">
+                <input type="file" class="form-control w-50" placeholder="Imagen" accept=".svg,image/png, image/jpeg," 
+                    formControlName="imagen"
+                    (change)="cargaImg($event)">
+                <div class="d-flex w-100 justify-content-center mt-3">
+                    <div class="d-flex justify-content-center w-50">
+                        <img *ngIf="formCursos.get('imagen')?.value" [src]="tempImg()" alt="imagen Cargada" class="img-fluid rounded">
+                    </div>
+                </div>
+                <button class="btn btn-success w-75 mt-3" *ngIf="isCreate(); else edit">Crear</button>
+                <ng-template #edit>
+                    <button class="btn btn-primary w-75 mt-3" (click)="updateCurso()">Editar</button>
+                </ng-template>
+            </div>
+        </form>
+    </div>
+    <!-- <pre>
+        {{formCursos.get('imagen')?.value }}
+    </pre> -->
+    <div class="d-flex w-100 justify-content-center mt-3">
+        <h3>Listado de Cursos</h3>
+    </div>
+    <div class="d-flex w-100">
+        <table class="table-responsive table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">titulo</th>
+                    <th scope="col">categoria</th>
+                    <th scope="col" class="w-25">descripcion</th>
+                    <th scope="col">duracion</th>
+                    <th scope="col">imagen</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr *ngFor="let curso of listCursos; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{curso.titulo}}</td>
+                    <td>{{curso.categoria | titlecase}}</td>
+                    <td class="h-25">{{curso.descripcion}}</td>
+                    <td>{{curso.duracion}} min.</td>
+                    <td><img [src]="curso.imagen" class="img-fluid rounded" alt="imagen curso" loading="lazy"></td>
+                    <td>
+                        <div class="d-flex">
+                            <button class="btn btn-primary me-1" (click)="editCurso(curso)"><i class="bi bi-pencil-fill"></i></button>
+                            <button class="btn btn-danger"><i class="bi bi-x-circle-fill"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
