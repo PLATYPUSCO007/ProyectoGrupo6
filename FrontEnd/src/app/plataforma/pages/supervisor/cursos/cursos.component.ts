@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CategoriasCurso, Curso } from '../../../../interfaces/Curso.interface';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -11,13 +11,16 @@ export class CursosComponent{
 
   public isCreate = signal<boolean>(true);
   public tempImg = signal<string | ArrayBuffer>('');
+  public eventFile = signal<any>('');
 
   public listCategorias: CategoriasCurso[] = [
     CategoriasCurso['BASE DE DATOS'],
     CategoriasCurso['COMPUTACION EN LA NUBE'],
     CategoriasCurso['PROGRAMACION'],
     CategoriasCurso['SEGURIDAD']
-  ]
+  ];
+
+  public keysCurso: (keyof Curso)[] = ['titulo', 'descripcion', 'duracion', 'imagen', 'categoria']
 
   public listCursos: Curso[] = [
     {
@@ -67,24 +70,7 @@ export class CursosComponent{
   })
 
   cargaImg(e: any){
-    const blob = e.target.files[0];
-    const fileReader = new FileReader();
-    let newImg: string | ArrayBuffer | null = '';
-    fileReader.onload = function(e){
-      if (!e) return;
-      const imgUrl = e.target!.result;
-      newImg = imgUrl;
-      console.log(newImg);
-    }
-    fileReader.readAsDataURL(blob);
-    setTimeout(() => {
-      this.updateTempImg(newImg);
-    }, 500);
-  }
-
-  updateTempImg(temp: string | ArrayBuffer | null){
-    if (!temp) return;
-    this.tempImg.update(()=>temp)
+    this.eventFile.update(()=>e);
   }
 
   crearCurso(){
@@ -95,11 +81,13 @@ export class CursosComponent{
   editCurso(curso: Curso){
     const cursoVal = {...curso};
     cursoVal.imagen = '';
-    this.isCreate.update(()=>false);
     this.formCursos.setValue(cursoVal);
+    this.isCreate.update(()=>false);
   }
 
   updateCurso(){
     this.isCreate.update(()=>true);
+    this.formCursos.reset();
+    this.formCursos.get('categoria')?.setValue('');
   }
 }

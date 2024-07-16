@@ -1,0 +1,46 @@
+<div class="d-flex flex-column w-100 mt-3">
+    <div class="d-flex flex-column w-100 justify-content-center">
+        <h3 class="text-center">Crear Paquete</h3>
+        <hr>
+    </div>
+    <div class="d-flex w-100">
+        <form [formGroup]="formPaquete">
+            <div class="d-flex flex-wrap w-100 justify-content-center">
+                <input type="text" class="form-control w-25 me-3 mb-3" placeholder="Titulo" formControlName="titulo">
+                <select class="form-control w-25 w-50 mb-3 me-3" formControlName="categoria">
+                    <option value="">-- Seleccione una categoria --</option>
+                    <option *ngFor="let cat of listCategoriasPaquete" [value]="cat">{{cat | titlecase}}</option>
+                </select>
+                <label for="descp" class="form-label w-50">Descripcion del curso</label>
+                <textarea name="descp" class="form-control w-50 me-3 mb-3" cols="15" rows="5" placeholder="Ingrese una descripcion del curso"
+                    formControlName="descripcion">
+                </textarea>
+                <select class="form-control w-25 w-25 mb-3 me-3" formControlName="cursos" multiple>
+                    <option value="">-- Seleccione los cursos --</option>
+                    <option *ngFor="let cat of listCursos" [value]="cat">{{cat | titlecase}}</option>
+                </select>
+                <input type="file" class="form-control w-50" placeholder="Imagen" accept=".svg,image/png, image/jpeg," 
+                    formControlName="imagen"
+                    (change)="cargaImg($event)">
+                <div class="d-flex w-100 justify-content-center mt-3">
+                    <div class="d-flex justify-content-center w-50">
+                        <app-img-load [eventImg]="eventFile()" [isShow]="formPaquete.get('imagen')?.value"/>
+                    </div>
+                </div>
+                <button class="btn btn-success w-75 mt-3" *ngIf="isCreate(); else edit">Crear</button>
+                <ng-template #edit>
+                    <button class="btn btn-primary w-75 mt-3" (click)="updatePaquete()">Editar</button>
+                </ng-template>
+            </div>
+        </form>
+    </div>
+    <!-- <pre>
+        {{formPaquete.get('imagen')?.value }}
+    </pre> -->
+    <div class="d-flex w-100 justify-content-center mt-3">
+        <h3>Listado de Paquetes</h3>
+    </div>
+    <div class="d-flex w-100">
+        <app-table  class="w-100" [keys]="keysPaquete" [listArray]="listPaquetes" (objectEdit)="editPaquete($event)"/>
+    </div>
+</div>

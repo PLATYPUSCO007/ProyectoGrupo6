@@ -14,12 +14,12 @@ export class SupervisoresPageComponent {
       route: '/plataforma/supervisor/crudEstudiantes'
     },
     {
-      title: 'Cursos',
-      route: '/plataforma/supervisor/crudCursos'
-    },
-    {
       title: 'Paquetes',
       route: '/plataforma/supervisor/crudPaquetes'
+    },
+    {
+      title: 'Cursos',
+      route: '/plataforma/supervisor/crudCursos'
     },
     {
       title: 'Modulos',

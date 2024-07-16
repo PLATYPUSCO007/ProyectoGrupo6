@@ -1,0 +1,30 @@
+<table class="table-responsive table-sm">
+    <thead class="table-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col" *ngFor="let key of keys">{{key}}</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        <tr *ngFor="let val of listArray; let i=index">
+            <td>{{i+1}}</td>
+            <td *ngFor="let key of keys">
+                <img *ngIf="key === 'imagen'; else row" [src]="val[key]" class="img-fluid rounded" alt="imagen curso" loading="lazy">
+                <ng-template #row>
+                    {{val[key]}} <span *ngIf="key === 'duracion'">min</span>
+                </ng-template>
+            </td>
+            <!-- <td>{{curso.categoria | titlecase}}</td>
+            <td class="h-25">{{curso.descripcion}}</td>
+            <td>{{curso.duracion}} min.</td>
+            <td><img [src]="curso.imagen" class="img-fluid rounded" alt="imagen curso" loading="lazy"></td> -->
+            <td>
+                <div class="d-flex">
+                    <button class="btn btn-primary me-1" (click)="sendValueEdit(val)"><i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn btn-danger"><i class="bi bi-x-circle-fill"></i></button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
