@@ -4,12 +4,7 @@ import { Router } from '@angular/router';
 import { User } from '../interfaces/Roles.interface';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
-
-interface Menu {
-  route: string;
-  title: string;
-  icon: string;
-}
+import { Menu } from '../interfaces/Menu.interface';
 
 @Component({
   selector: 'app-menu',
@@ -22,12 +17,12 @@ export class MenuComponent {
     {
       route: 'home',
       title: 'Inicio',
-      icon: 'bi bi-house-door-fill me-3'
+      icon: 'bi bi-house-door-fill me-3',
     },
     {
       route: 'cursos',
       title: 'Cursos',
-      icon: 'bi bi bi-book-half me-3'
+      icon: 'bi bi bi-book-half me-3',
     },
     {
       route: 'estudiantes',
@@ -37,12 +32,14 @@ export class MenuComponent {
     {
       route: 'supervisor',
       title: 'Supervisores',
-      icon: 'bi bi-eye-fill me-3'
+      icon: 'bi bi-eye-fill me-3',
+      profile: 'Ricardo'
     },
     {
       route: 'tutores',
       title: 'Tutores',
-      icon: 'bi bi-rocket-takeoff-fill me-3'
+      icon: 'bi bi-rocket-takeoff-fill me-3',
+      profile: 'RicardoE'
     },
   ];
 

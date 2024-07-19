@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+
 import { LayoutPlataformaComponent } from './layout/layout-plataforma/layout-plataforma.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { CursosPageComponent } from './pages/cursos-page/cursos-page.component';
@@ -9,6 +10,8 @@ import { TutoresPageComponent } from './pages/tutores-page/tutores-page.componen
 import { EstudiantesComponent } from './pages/supervisor/estudiantes/estudiantes.component';
 import { CursosComponent } from './pages/supervisor/cursos/cursos.component';
 import { DashboardsComponent } from './pages/supervisor/dashboards/dashboards.component';
+
+import {ProfileGuard} from '../guards/profile.guard';
 
 const routes: Routes = [{
   path: '',
@@ -25,6 +28,8 @@ const routes: Routes = [{
   },{
     path: 'supervisor',
     component: SupervisoresPageComponent,
+    canActivate: [ProfileGuard],
+    data: {profile: 'Ricardo'},
     children: [{
       path: 'crudEstudiantes',
       component: EstudiantesComponent
@@ -41,6 +46,8 @@ const routes: Routes = [{
   },{
     path: 'tutores',
     component: TutoresPageComponent,
+    canActivate: [ProfileGuard],
+    data: {profile: 'RicardoE'},
   },{
     path: '**',
     redirectTo: 'home'
