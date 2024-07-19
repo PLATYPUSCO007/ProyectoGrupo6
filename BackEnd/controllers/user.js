@@ -1,7 +1,6 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../services/jwt.js";
-//import {RoleService} from "../services/role.service.js";
 
 // Método para Registrar de usuarios
 export const register = async (req, res) => {

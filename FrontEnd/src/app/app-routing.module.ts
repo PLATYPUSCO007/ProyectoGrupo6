@@ -8,8 +8,8 @@ const routes: Routes = [{
 },{
   path: 'plataforma',
   loadChildren: ()=>import('./plataforma/plataforma.module').then(m=>m.PlataformaModule),
-  canActivate: [AuthGuard],
-  canLoad: [AuthGuard]
+  /*canActivate: [AuthGuard],
+  canLoad: [AuthGuard]*/
 },{
   path: '**',
   redirectTo: 'sesion'

@@ -82,88 +82,59 @@ export const saveCurso = async (req, res) => {
   }
 }
 
-//Método para actualizar los datos del curso
-/*export const updateCurso = async (req, res) => {
+export const updateCurso = async (req, res) => {
   try {
-    // Recoger información del usuario a actualizar
-    let cursoIdentity = req.curso;
+    // Recoger información del curso a actualizar
+    let cursoId = req.params.id;
     let cursoToUpdate = req.body;
 
     // Validar que los campos necesarios estén presentes
-    if (!cursoToUpdate.titulo || !cursoToUpdate.cedula) {
+    if (!cursoToUpdate.titulo) {
       return res.status(400).send({
         status: "error",
-        message: "¡Los campos email y cedula son requeridos!",
+        message: "¡El campo título son requeridos!",
       });
     }
 
     // Eliminar campos sobrantes
-    delete userToUpdate.iat;
-    delete userToUpdate.exp;
+    delete cursoToUpdate.iat;
+    delete cursoToUpdate.exp;
 
-    // Comprobar si el usuario ya existe
-    const users = await User.find({
+    // Comprobar si el curso ya existe con el mismo título
+    const cursos = await Curso.find({
       $or: [
-        { email: userToUpdate.email.toLowerCase() },
-        { cedula: userToUpdate.cedula.toLowerCase() },
+        { titulo: cursoToUpdate.titulo.toLowerCase() }
       ],
     }).exec();
 
-    // Verificar si el usuario está duplicado y evitar conflicto
-    const isDuplicateUser = users.some((user) => {
-      return user && user._id.toString() !== userIdentity.userId;
-    });
-
-    if (isDuplicateUser) {
-      return res.status(400).send({
-        status: "error",
-        message: "Solo se puede modificar los datos del usuario logueado.",
-      });
-    }
-
-    // Cifrar la contraseña si se proporciona
-    if (userToUpdate.password) {
-      try {
-        let pwd = await bcrypt.hash(userToUpdate.password, 10);
-        userToUpdate.password = pwd;
-      } catch (hashError) {
-        return res.status(500).send({
-          status: "error",
-          message: "Error al cifrar la contraseña",
-        });
-      }
-    } else {
-      delete userToUpdate.password;
-    }
-
-    // Buscar y Actualizar el usuario a modificar en la BD
-    let userUpdated = await User.findByIdAndUpdate(
-      userIdentity.userId,
-      userToUpdate,
+    // Buscar y Actualizar el curso a modificar en la BD
+    let cursoUpdated = await Curso.findByIdAndUpdate(
+      cursoId,
+      cursoToUpdate,
       { new: true },
     );
 
-    if (!userUpdated) {
+    if (!cursoUpdated) {
       return res.status(400).send({
         status: "error",
-        message: "Error al actualizar el usuario",
+        message: "Error al actualizar el curso",
       });
     }
 
-    // Devolver respuesta exitosa con el usuario actualizado
+    // Devolver respuesta exitosa con el curso actualizado
     return res.status(200).json({
       status: "success",
-      message: "¡Usuario actualizado correctamente!",
-      user: userUpdated,
+      message: "¡Curso actualizado correctamente!",
+      curso: cursoUpdated,
     });
   } catch (error) {
-    console.log("Error al actualizar los datos del usuario", error);
+    console.log("Error al actualizar los datos del curso", error);
     return res.status(500).send({
       status: "error",
-      message: "Error al actualizar los datos del usuario",
+      message: "Error al actualizar los datos del curso",
     });
   }
-};*/
+};
 
 export const addUserToCurso = async (req, res) => {
   try {
