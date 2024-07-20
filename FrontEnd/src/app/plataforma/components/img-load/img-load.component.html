@@ -1,0 +1,4 @@
+<div class="spinner-border text-primary" role="status" *ngIf="tempImg() === '' && isShow">
+    <span class="visually-hidden">Loading...</span>
+</div>
+<img *ngIf="isShow && tempImg() !== ''" [src]="tempImg()" alt="imagen Cargada" class="img-fluid rounded">

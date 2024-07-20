@@ -12,6 +12,8 @@ import { CursosComponent } from './pages/supervisor/cursos/cursos.component';
 import { DashboardsComponent } from './pages/supervisor/dashboards/dashboards.component';
 
 import {ProfileGuard} from '../guards/profile.guard';
+import { PaquetesComponent } from './pages/supervisor/paquetes/paquetes.component';
+import { ModulosComponent } from './pages/supervisor/modulos/modulos.component';
 
 const routes: Routes = [{
   path: '',
@@ -37,6 +39,13 @@ const routes: Routes = [{
       path: 'crudCursos',
       component: CursosComponent
     },{
+      path: 'crudPaquetes',
+      component: PaquetesComponent
+    },{
+      path: 'crudModulos',
+      component: ModulosComponent
+    },
+    {
       path: 'dashboards',
       component: DashboardsComponent
     },{

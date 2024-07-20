@@ -17,6 +17,10 @@ import { CodigoActivacionDirective } from './directives/codigo-activacion.direct
 import { CursosComponent } from './pages/supervisor/cursos/cursos.component';
 import { DashboardsComponent } from './pages/supervisor/dashboards/dashboards.component';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { PaquetesComponent } from './pages/supervisor/paquetes/paquetes.component';
+import { ModulosComponent } from './pages/supervisor/modulos/modulos.component';
+import { TableComponent } from './components/table/table.component';
+import { ImgLoadComponent } from './components/img-load/img-load.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +36,11 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     CodigoActivacionDirective,
     CursosComponent,
     DashboardsComponent,
-    MenuComponent
+    MenuComponent,
+    PaquetesComponent,
+    ModulosComponent,
+    TableComponent,
+    ImgLoadComponent
   ],
   imports: [
     CommonModule,
