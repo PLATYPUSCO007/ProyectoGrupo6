@@ -3,7 +3,7 @@ import connection from "./database/connection.js";
 import express, { json, urlencoded } from "express";
 import cors from "cors";
 import UserRoutes from './routes/user.js'
-import EstudianteRoutes from './routes/estudiante.js'
+import CursoRoutes from './routes/curso.js'
 
 //Conexion BD
 connection();
@@ -21,9 +21,8 @@ app.use(urlencoded({extended: true}));
 
 //Rutas
 app.use('/api/user', UserRoutes);
-app.use('/api/estudiante', EstudianteRoutes);
+app.use('/api/curso', CursoRoutes);
 
-/*app.use('/api/curso', )*/
 
 // Configurar el servidor para escuchar las peticiones HTTP
 app.listen(puerto, () => {

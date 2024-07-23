@@ -6,7 +6,7 @@ import { ensureAuth } from "../middleware/auth.js";
 
 
 //Rutas
-router.post('/register/:role', register);
+router.post('/register', register);
 router.post('/login', login);
 router.put('/update', ensureAuth, updateUser);
 
