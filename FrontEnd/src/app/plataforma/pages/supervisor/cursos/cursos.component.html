@@ -21,7 +21,7 @@
                     (change)="cargaImg($event)">
                 <div class="d-flex w-100 justify-content-center mt-3">
                     <div class="d-flex justify-content-center w-50">
-                        <img *ngIf="formCursos.get('imagen')?.value" [src]="tempImg()" alt="imagen Cargada" class="img-fluid rounded">
+                        <app-img-load [eventImg]="eventFile()" [isShow]="formCursos.get('imagen')?.value"/>
                     </div>
                 </div>
                 <button class="btn btn-success w-75 mt-3" *ngIf="isCreate(); else edit">Crear</button>
@@ -38,7 +38,8 @@
         <h3>Listado de Cursos</h3>
     </div>
     <div class="d-flex w-100">
-        <table class="table-responsive table-sm">
+        <app-table  class="w-100" [keys]="keysCurso" [listArray]="listCursos" (objectEdit)="editCurso($event)"/>
+        <!-- <table class="table-responsive table-sm">
             <thead class="table-light">
                 <tr>
                     <th scope="col">#</th>
@@ -66,6 +67,6 @@
                     </td>
                 </tr>
             </tbody>
-        </table>
+        </table> -->
     </div>
 </div>
