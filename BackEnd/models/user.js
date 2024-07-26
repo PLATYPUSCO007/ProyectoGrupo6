@@ -28,7 +28,9 @@ const UserSchema = Schema ({
   },
   estado: {
     type: String,
-    required: true
+    required: true,
+    enum : ['activo','inactivo'],
+    default: "activo"
   },
   id_curso: [{
     type: Schema.ObjectId,

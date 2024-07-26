@@ -101,11 +101,13 @@ export const updateCurso = async (req, res) => {
     delete cursoToUpdate.exp;
 
     // Comprobar si el curso ya existe con el mismo título
+    /*
     const cursos = await Curso.find({
       $or: [
         { titulo: cursoToUpdate.titulo.toLowerCase() }
       ],
     }).exec();
+    */
 
     // Buscar y Actualizar el curso a modificar en la BD
     let cursoUpdated = await Curso.findByIdAndUpdate(
@@ -125,7 +127,7 @@ export const updateCurso = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "¡Curso actualizado correctamente!",
-      curso: cursoUpdated,
+      object: cursoUpdated,
     });
   } catch (error) {
     console.log("Error al actualizar los datos del curso", error);
@@ -191,3 +193,47 @@ export const addUserToCurso = async (req, res) => {
     });
   }
 };
+
+export const getCursos = async (req, res)=>{
+  try {
+    const {page} = req.params || 1;
+    const {limit} = req.query || 10;
+
+    const options = {
+      page,
+      limit,
+      select: ['-__v'],
+    }
+
+    const cursos = await Curso.paginate({}, options);
+    
+    if (!cursos || cursos.docs.length <= 0) {
+        res.status(200).json({
+            status: SUCCESS,
+            msg: "No hay cursos disponibles",
+        });
+        return;
+    }
+
+    res.status(200).json({
+        status: 'success',
+        object: cursos.docs,
+        totalDocs: cursos.totalDocs,
+        totalPages: cursos.totalPages,
+        page: cursos.page,
+        pagingCounter: cursos.pagingCounter,
+        hasPrevPage: cursos.hasPrevPage,
+        hasNextPage: cursos.hasNextPage,
+        prevPage: cursos.prevPage,
+        nextPage: cursos.nextPage,
+        limit: cursos.limit,
+    });
+    
+  } catch (error) {
+    console.log("Error al obtener los cursos", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al obtener los cursos",
+    });
+  }
+}

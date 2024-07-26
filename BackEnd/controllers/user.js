@@ -29,8 +29,18 @@ export const register = async (req, res) => {
     }
 
     // Desestructurar datos de usuario
-    const { cedula, name, last_name, telefono, email, rol, password, estado, id_curso } = params;
-    
+    const {
+      cedula,
+      name,
+      last_name,
+      telefono,
+      email,
+      rol,
+      password,
+      estado,
+      id_curso,
+    } = params;
+
     const userData = {
       cedula: cedula,
       name: name,
@@ -40,7 +50,7 @@ export const register = async (req, res) => {
       rol: rol,
       password: password,
       estado: estado,
-      id_curso: id_curso
+      id_curso: id_curso,
     };
 
     // Crear una instancia del modelo User con los datos validados
@@ -79,7 +89,7 @@ export const register = async (req, res) => {
         name: user_to_save.name,
         last_name: user_to_save.last_name,
         cedula: user_to_save.cedula,
-        rol: user_to_save.rol
+        rol: user_to_save.rol,
       },
     });
   } catch (error) {
@@ -116,6 +126,14 @@ export const login = async (req, res) => {
       });
     }
 
+    //Si esta inactivo
+    if (user.estado === "inactivo") {
+      return res.status(404).json({
+        status: "error",
+        message: "El usuario no esta activo",
+      });
+    }
+
     // Comprobar si el password recibido es igual al que está almacenado en la BD
     const validPassword = await bcrypt.compare(params.password, user.password);
 
@@ -144,9 +162,8 @@ export const login = async (req, res) => {
         telefono: user.telefono,
         email: user.email,
         cedula: user.cedula,
-        rol: user.rol,
+        rol: user.rol || "estudiante",
         created_at: user.created_at,
-        role: role.isEstudiante || role.isSupervisor,
       },
     });
   } catch (error) {
@@ -207,7 +224,7 @@ export const profile = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     // Recoger información del usuario a actualizar
-    let userIdentity = req.user;
+    let {id} = req.params;
     let userToUpdate = req.body;
 
     // Validar que los campos necesarios estén presentes
@@ -219,8 +236,8 @@ export const updateUser = async (req, res) => {
     }
 
     // Eliminar campos sobrantes
-    delete userToUpdate.iat;
-    delete userToUpdate.exp;
+    //delete userToUpdate.iat;
+    //delete userToUpdate.exp;
 
     // Comprobar si el usuario ya existe
     const users = await User.find({
@@ -232,7 +249,7 @@ export const updateUser = async (req, res) => {
 
     // Verificar si el usuario está duplicado y evitar conflicto
     const isDuplicateUser = users.some((user) => {
-      return user && user._id.toString() !== userIdentity.userId;
+      return user && user._id.toString() !== id;
     });
 
     if (isDuplicateUser) {
@@ -259,7 +276,7 @@ export const updateUser = async (req, res) => {
 
     // Buscar y Actualizar el usuario a modificar en la BD
     let userUpdated = await User.findByIdAndUpdate(
-      userIdentity.userId,
+      id,
       userToUpdate,
       { new: true },
     );
@@ -275,7 +292,7 @@ export const updateUser = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "¡Usuario actualizado correctamente!",
-      user: userUpdated,
+      object: userUpdated,
     });
   } catch (error) {
     console.log("Error al actualizar los datos del usuario", error);
@@ -285,6 +302,56 @@ export const updateUser = async (req, res) => {
     });
   }
 };
+
+//metodo para devolver listado de usuarios
+export const listUsers = async (req, res) =>{
+  try{
+    let {page} = req.params || 1;
+    let {limit} = req.query || 10;
+
+    let options = {
+      page,
+      limit,
+      select: ['-password', '-__v'],
+      populate: {
+        path: 'id_curso',
+        select: '-__v, '
+      },
+      lean: true
+    }
+    
+    let users = await User.paginate({}, options);
+
+    if (!users || users.docs.length <= 0) {
+        res.status(200).json({
+            status: SUCCESS,
+            msg: "No hay usuarios disponibles",
+        });
+        return;
+    }
+
+    res.status(200).json({
+        status: 'success',
+        object: users.docs,
+        totalDocs: users.totalDocs,
+        totalPages: users.totalPages,
+        page: users.page,
+        pagingCounter: users.pagingCounter,
+        hasPrevPage: users.hasPrevPage,
+        hasNextPage: users.hasNextPage,
+        prevPage: users.prevPage,
+        nextPage: users.nextPage,
+        limit: users.limit,
+    });
+    
+  }catch(error){
+    console.log("Error al listar los usuarios", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al listar los usuarios",
+    });
+  }
+}
 
 // Método guardar progreso del usuario
 /*export const counters = async (req, res) => {
