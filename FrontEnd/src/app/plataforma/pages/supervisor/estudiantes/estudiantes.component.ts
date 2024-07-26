@@ -1,91 +1,118 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Estado, Estudiante } from '../../../interfaces/Estudiante.interface';
+import { User, Estado, Rol } from '../../../../interfaces/Roles.interface';
+import { UserService } from '../../../services/user.service';
+import { switchMap } from 'rxjs';
+
 
 @Component({
   selector: 'app-estudiantes',
   templateUrl: './estudiantes.component.html',
   styleUrl: './estudiantes.component.css'
 })
-export class EstudiantesComponent {
+export class EstudiantesComponent implements OnInit {
 
-  private newEstudiante: Estudiante = {
-    apellido: '',
+  public keysUser: (keyof User)[] = ['cedula', 'name', 'last_name', 'telefono', 'email', 'rol', 'estado'];
+
+  private newUser: User = {
     cedula: '',
-    codigo_activacion: '',
-    email: '',
-    estado: Estado.REGISTRADO,
-    matricula: '',
-    nombre: '',
-    supervisor: '',
+    name: '',
+    last_name: '',
     telefono: '',
+    email: '',
+    password: '',
+    rol: Rol.ESTUDIANTE,
+    estado: Estado.ACTIVO,
   }
-
-  public listEstudiantes: Estudiante[] = [
-    {
-      apellido: 'Rodriguez',
-      cedula: '12312',
-      codigo_activacion: '323424',
-      email: 'rodrigo@sdfas.com',
-      estado: Estado.REGISTRADO,
-      matricula: 'MAT-423',
-      nombre: 'Ramon',
-      supervisor: 'Pepito',
-      telefono: '431231',
-    },
-    {
-      apellido: 'Rojas',
-      cedula: '234234',
-      codigo_activacion: '52342d',
-      email: 'rojas@sdfs.com',
-      estado: Estado.REGISTRADO,
-      matricula: 'MAT-111',
-      nombre: 'Filoberta',
-      supervisor: 'Pepito',
-      telefono: '213123',
-    } 
-  ]
 
   public isEdit = signal(false);
 
   private fb = inject(FormBuilder);
-  public formEstudiante: FormGroup = this.fb.group({
+  private userService = inject(UserService);
+
+  public formUser: FormGroup = this.fb.group({
+    'id': [''],
     'cedula': ['', [Validators.required]],
-    'nombre': ['', [Validators.required]],
-    'apellido': ['', [Validators.required]],
+    'name': ['', [Validators.required]],
+    'last_name': ['', [Validators.required]],
     'telefono': ['', [Validators.required]],
     'email': ['', [Validators.required, Validators.email]],
-    'matricula': [{value: `MAT-${Date.now()}`, disabled: true}, [Validators.required]],
-    'codigo_activacion': [`${crypto.randomUUID()}`, [Validators.required]],
+    'password': [''],
+    'rol': ['', [Validators.required]],
     'estado': ['', [Validators.required]],
-    'supervisor': ['', [Validators.required]],
   });
 
-  public estadoEstudiante: Estado[] = [Estado.ACTIVO, Estado.INACTIVO, Estado.REGISTRADO];
+  public estadoUser: Estado[] = [Estado.ACTIVO, Estado.INACTIVO];
+  public rolUser: Rol[] = [Rol.ESTUDIANTE, Rol.SUPERVISOR, Rol.TUTOR];
 
-  createEstudiante(){
-    this.formEstudiante.get('matricula')?.enable();
-    const estudent = this.formEstudiante.value;
-    this.newEstudiante = {...estudent};
-    this.resetForm();
+  get listUsers(): User[]{
+    return this.userService.listUser;
   }
 
-  sendEditEstudiante(){
-    this.isEdit.update(()=>false);
-    this.resetForm();
+  ngOnInit(): void {
+    this.getListUsers();
   }
 
-  editEstudiante(estudiante: Estudiante){
-    this.formEstudiante.setValue(estudiante);
+  getListUsers(){
+    this.userService.getUsers()
+      .subscribe({
+        next: (users)=>{
+          this.userService.listUser = users;
+        },
+        error: (e)=>{
+          console.log(e);
+        }
+      });
+  }
+
+  createUser(){
+    if (this.formUser.invalid) return;
+    const user = this.formUser.value;
+    // this.newUser = {...user};
+
+    this.userService.createUser(user)
+      .pipe(
+        switchMap(()=>this.userService.getUsers())
+      ).subscribe({
+        next: (users)=>{
+          this.resetForm();
+          this.userService.listUser = users;
+        },
+        error: (e)=>{
+          console.log(e);
+        }
+      })
+  }
+
+  sendEditUser(){
+    if (this.formUser.invalid) return;
+    this.userService.updateUser(this.formUser.value)
+      .pipe(
+        switchMap(()=>this.userService.getUsers())
+      ).subscribe({
+        next: (users)=>{
+          this.userService.listUser = users;
+          this.isEdit.update(()=>false);
+          this.resetForm();
+        },
+        error: (e)=>{
+          console.error(e);
+        }
+      })
+  }
+
+  editUser(user: User){
+    const {_id, id_curso, created_at, ...editUser} = user;
+    editUser.password = '';
+    this.formUser.setValue(editUser);
     this.isEdit.update(()=>true);
   }
 
-  deleteEstudiante(){
+  deleteUser(){
     
   }
 
   resetForm(){
-    this.formEstudiante.reset({'matricula': `MAT-${Date.now()}`, 'estado': '', 'supervisor': ''});
-    this.formEstudiante.get('matricula')?.disable();
+    this.formUser.reset({'estado': '', 'rol': ''});
   }
 }

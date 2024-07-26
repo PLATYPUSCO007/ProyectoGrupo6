@@ -1,4 +1,4 @@
-import { Estudiante, Supervisor, User } from "../../interfaces/Roles.interface";
+import { User } from "../../interfaces/Roles.interface";
 
 export interface LoginData{
     email: string;

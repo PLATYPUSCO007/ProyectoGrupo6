@@ -1,5 +1,7 @@
 export interface Curso{
     id?: string;
+    _id?: string;
+    id_usuario?: string[];
     titulo: string;
     categoria?: CategoriasCurso;
     descripcion: string;

@@ -1,13 +1,18 @@
+import { Curso } from "./Curso.interface";
+
 export interface User {
     id?: string;
+    _id?: string;
     name: string;
     last_name: string;
     cedula: string;
     telefono: string;
     email: string;
     password?: string;
+    rol?: Rol;
+    estado: Estado;
+    id_curso?: Curso;
     created_at?: Date;
-    role?: Estudiante | Supervisor;
 }
 
 export interface Estudiante{
@@ -27,6 +32,11 @@ export interface Supervisor{
 
 export enum Estado{
     'ACTIVO' = 'activo',
-    'REGISTRADO' = 'registrado',
     'INACTIVO' = 'inactivo'
+}
+
+export enum Rol{
+    'ESTUDIANTE' = 'estudiante',
+    'SUPERVISOR' = 'supervisor',
+    'TUTOR' = 'tutor'
 }

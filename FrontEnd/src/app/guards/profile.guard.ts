@@ -12,7 +12,7 @@ export class ProfileGuard implements CanActivate {
 
     canActivate( route: ActivatedRouteSnapshot): Observable<boolean> | Promise<boolean> | boolean{
         const profile = route.data['profile'];
-        const profileUser = this.loginService.userSession.name;
+        const profileUser = this.loginService.userSession.rol;
         return (profile === profileUser);
     }
 }

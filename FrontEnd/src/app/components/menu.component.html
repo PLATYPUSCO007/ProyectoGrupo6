@@ -7,7 +7,7 @@
         </div>
         <div class="d-flex flex-column justify-content-start ms-3">
             <h6 class="text-capitalize lh-1">{{completeName()}}</h6>
-            <p class="fs-6 fw-light lh-1">{{user()!.cedula}}</p>
+            <p class="fs-6 fw-light lh-1">C.C: {{user()!.cedula}}</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
             <li class="list-group-item text-start" *ngFor="let menu of menuArray"
             [routerLink]="menu.route" 
             routerLinkActive="active"
-            [hidden]="menu.profile !== user()?.name && !!menu.profile">
+            [hidden]="menu.profile !== user()?.rol && !!menu.profile">
                 <i [className]="menu.icon"></i>{{menu.title}}
             </li>
             <li class="list-group-item text-start bg-danger text-white" 
@@ -28,7 +28,7 @@
     </div>
 
     <div class="d-flex flex-column justify-content-center align-items-center">
-        <h5 class="text-center text-secondary text-wrap text-capitalize mb-3">Plataforma de apredizaje en linea</h5>
+        <h5 class="text-center text-secondary text-wrap text-capitalize mb-3">Plataforma de aprendizaje en línea</h5>
         <img src="./logo.png" alt="logo" loading="lazy" width="150px" height="150px">
     </div>
 </div>
