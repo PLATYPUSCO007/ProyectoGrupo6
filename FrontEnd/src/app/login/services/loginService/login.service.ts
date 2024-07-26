@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { environments } from '../../../../environments/environments';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 import { LoginData, LoginResponse } from '../../interfaces/log.interface';
 import { User } from '../../../interfaces/Roles.interface';
@@ -25,6 +25,17 @@ export class LoginService {
       this.userLogued = JSON.parse(localStorage.getItem('session')!).user;
     }
     return this.userLogued!;
+  }
+
+  get userToken(): string {
+    return (localStorage.getItem('session')) ? JSON.parse(localStorage.getItem('session')!).token : '';
+  }
+
+  getHeader(): HttpHeaders{
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.userToken}`
+    });
+    return headers;
   }
 
   logUser(credentials: LoginData): Observable<User>{

@@ -33,13 +33,13 @@ export class MenuComponent {
       route: 'supervisor',
       title: 'Supervisores',
       icon: 'bi bi-eye-fill me-3',
-      profile: 'Ricardo'
+      profile: 'supervisor'
     },
     {
       route: 'tutores',
       title: 'Tutores',
       icon: 'bi bi-rocket-takeoff-fill me-3',
-      profile: 'RicardoE'
+      profile: 'tutor'
     },
   ];
 

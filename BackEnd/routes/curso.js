@@ -1,14 +1,13 @@
 // Importaciones
 import { Router } from "express";
 const router = Router();
-import { addUserToCurso, saveCurso, updateCurso } from "../controllers/curso.js";
-import { ensureAuth } from "../middleware/auth.js";
-
+import { addUserToCurso, saveCurso, updateCurso, getCursos } from "../controllers/curso.js";
 
 //Rutas
-router.post('/register',ensureAuth, saveCurso);
-router.post('/addcurso/:id',ensureAuth, addUserToCurso);
-router.post('/updatecurso/:id',ensureAuth, updateCurso);
+router.post('/register', saveCurso);
+router.post('/addcurso/:id', addUserToCurso);
+router.put('/update/:id', updateCurso);
+router.get('/list/:page', getCursos);
 
 // Exportar el Router
 export default router;

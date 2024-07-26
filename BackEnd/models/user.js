@@ -28,7 +28,9 @@ const UserSchema = Schema ({
   },
   estado: {
     type: String,
-    required: true
+    required: true,
+    enum : ['activo','inactivo'],
+    default: "activo"
   },
   id_curso: [{
     type: Schema.ObjectId,
@@ -47,7 +49,6 @@ const UserSchema = Schema ({
 });
 
 // Añadir pluggin de paginación
-UserSchema.plugin(mongoosePaginate);
-
+UserSchema.plugin(mongoosePaginate); 
 
 export default model("User", UserSchema, "users");

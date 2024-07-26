@@ -31,7 +31,7 @@ const routes: Routes = [{
     path: 'supervisor',
     component: SupervisoresPageComponent,
     canActivate: [ProfileGuard],
-    data: {profile: 'Ricardo'},
+    data: {profile: 'supervisor'},
     children: [{
       path: 'crudEstudiantes',
       component: EstudiantesComponent
@@ -56,7 +56,7 @@ const routes: Routes = [{
     path: 'tutores',
     component: TutoresPageComponent,
     canActivate: [ProfileGuard],
-    data: {profile: 'RicardoE'},
+    data: {profile: 'tutor'},
   },{
     path: '**',
     redirectTo: 'home'

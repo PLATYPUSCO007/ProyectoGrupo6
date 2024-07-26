@@ -1,13 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CategoriasCurso, Curso } from '../../../../interfaces/Curso.interface';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CursoService } from '../../../services/curso.service';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-cursos',
   templateUrl: './cursos.component.html',
   styleUrl: './cursos.component.css'
 })
-export class CursosComponent{
+export class CursosComponent implements OnInit{
 
   public isCreate = signal<boolean>(true);
   public tempImg = signal<string | ArrayBuffer>('');
@@ -22,52 +24,37 @@ export class CursosComponent{
 
   public keysCurso: (keyof Curso)[] = ['titulo', 'descripcion', 'duracion', 'imagen', 'categoria']
 
-  public listCursos: Curso[] = [
-    {
-      titulo: "El Viaje Fantástico",
-      descripcion: "Una aventura épica a través de tierras desconocidas y llenas de misterio.",
-      duracion: 120,
-      imagen: "logo.png",
-      categoria: CategoriasCurso['BASE DE DATOS']
-    },
-    {
-      titulo: "Cocina de Ensueño",
-      descripcion: "Descubre recetas deliciosas y técnicas de cocina con los mejores chefs.",
-      duracion: 45,
-      imagen: "square.svg",
-      categoria: CategoriasCurso['COMPUTACION EN LA NUBE']
-    },
-    {
-      titulo: "Misterios del Espacio",
-      descripcion: "Explora los secretos del universo y los misterios del espacio profundo.",
-      duracion: 90,
-      imagen: "square.svg",
-      categoria: CategoriasCurso['PROGRAMACION']
-    },
-    {
-      titulo: "Ritmos del Mundo",
-      descripcion: "Un viaje musical a través de los diferentes ritmos y culturas del mundo.",
-      duracion: 60,
-      imagen: "square.svg",
-      categoria: CategoriasCurso['SEGURIDAD']
-    },
-    {
-      titulo: "Arte en Movimiento",
-      descripcion: "Una mirada al fascinante mundo del arte contemporáneo y sus protagonistas.",
-      duracion: 50,
-      imagen: "square.svg",
-      categoria: CategoriasCurso['BASE DE DATOS']
-    }
-  ];
-
   private fb = inject(FormBuilder);
   public formCursos: FormGroup = this.fb.group({
+    id: [''],
     titulo: ['', [Validators.required]],
     categoria: ['', [Validators.required]],
     descripcion: ['', [Validators.required]],
     duracion: ['', [Validators.required]],
-    imagen: ['', [Validators.required]]
+    imagen: ['']
   })
+
+  private cursoService = inject(CursoService);
+
+  get listCursos(): Curso[]{
+    return this.cursoService.listOfCursos;
+  }
+
+  ngOnInit(): void {
+    this.getCursos();
+  }
+
+  getCursos(){
+    this.cursoService.getCursos()
+      .subscribe({
+        next: (result)=>{
+          console.log(result);
+        },
+        error: (e)=>{
+          console.error(e);
+        }
+      })
+  }
 
   cargaImg(e: any){
     this.eventFile.update(()=>e);
@@ -76,18 +63,45 @@ export class CursosComponent{
   crearCurso(){
     if (this.formCursos.invalid) return;
     console.log(this.formCursos.value);
+    this.cursoService.postCurso(this.formCursos.value)
+      .pipe(
+        switchMap(()=>this.cursoService.getCursos())
+      )
+      .subscribe({
+        next: (curso)=>{
+          console.log(curso);
+          this.formCursos.reset();
+          this.formCursos.get('categoria')?.setValue('');
+        },
+        error: (e)=>{
+          console.log(e);
+        }
+      });
   }
 
   editCurso(curso: Curso){
-    const cursoVal = {...curso};
+    const {_id, created_at, id_usuario, ...cursoVal} = curso;
     cursoVal.imagen = '';
+    cursoVal.id = _id;
     this.formCursos.setValue(cursoVal);
     this.isCreate.update(()=>false);
   }
 
   updateCurso(){
-    this.isCreate.update(()=>true);
-    this.formCursos.reset();
-    this.formCursos.get('categoria')?.setValue('');
+    if (this.formCursos.invalid) return;
+    this.cursoService.updateCursos(this.formCursos.value)
+      .pipe(
+        switchMap(()=>this.cursoService.getCursos())
+      ).subscribe({
+        next: (result)=>{
+          console.log(result);
+          this.isCreate.update(()=>true);
+          this.formCursos.reset();
+          this.formCursos.get('categoria')?.setValue('');
+        },
+        error: (e)=>{
+          console.log(e);
+        }
+      })
   }
 }

@@ -6,6 +6,7 @@
     <div class="d-flex w-100">
         <form [formGroup]="formCursos">
             <div class="d-flex flex-wrap w-100 justify-content-center">
+                <input type="text" class="form-control w-25 me-3 mb-3" formControlName="id" hidden>
                 <input type="text" class="form-control w-25 me-3 mb-3" placeholder="Titulo" formControlName="titulo">
                 <select class="form-control w-50 w-25 mb-3 me-3" formControlName="categoria">
                     <option value="">-- Seleccione una categoria --</option>
@@ -24,7 +25,7 @@
                         <app-img-load [eventImg]="eventFile()" [isShow]="formCursos.get('imagen')?.value"/>
                     </div>
                 </div>
-                <button class="btn btn-success w-75 mt-3" *ngIf="isCreate(); else edit">Crear</button>
+                <button class="btn btn-success w-75 mt-3" (click)="crearCurso()" *ngIf="isCreate(); else edit">Crear</button>
                 <ng-template #edit>
                     <button class="btn btn-primary w-75 mt-3" (click)="updateCurso()">Editar</button>
                 </ng-template>
@@ -39,34 +40,5 @@
     </div>
     <div class="d-flex w-100">
         <app-table  class="w-100" [keys]="keysCurso" [listArray]="listCursos" (objectEdit)="editCurso($event)"/>
-        <!-- <table class="table-responsive table-sm">
-            <thead class="table-light">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">titulo</th>
-                    <th scope="col">categoria</th>
-                    <th scope="col" class="w-25">descripcion</th>
-                    <th scope="col">duracion</th>
-                    <th scope="col">imagen</th>
-                    <th scope="col">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="table-group-divider">
-                <tr *ngFor="let curso of listCursos; let i=index">
-                    <td>{{i+1}}</td>
-                    <td>{{curso.titulo}}</td>
-                    <td>{{curso.categoria | titlecase}}</td>
-                    <td class="h-25">{{curso.descripcion}}</td>
-                    <td>{{curso.duracion}} min.</td>
-                    <td><img [src]="curso.imagen" class="img-fluid rounded" alt="imagen curso" loading="lazy"></td>
-                    <td>
-                        <div class="d-flex">
-                            <button class="btn btn-primary me-1" (click)="editCurso(curso)"><i class="bi bi-pencil-fill"></i></button>
-                            <button class="btn btn-danger"><i class="bi bi-x-circle-fill"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table> -->
     </div>
 </div>

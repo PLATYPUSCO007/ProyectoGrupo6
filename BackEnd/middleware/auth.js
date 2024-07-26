@@ -1,6 +1,6 @@
-import jwt from 'jwt-simple';
-import moment from 'moment';
-import { secret } from '../services/jwt.js';
+import jwt from "jwt-simple";
+import moment from "moment";
+import { secret } from "../services/jwt.js";
 
 // Asegurar la autenticación
 export const ensureAuth = (req, res, next) => {
@@ -8,12 +8,12 @@ export const ensureAuth = (req, res, next) => {
   if (!req.headers.authorization) {
     return res.status(403).send({
       status: "error",
-      message: "La petición no tiene cabecera de autenticación"
+      message: "La petición no tiene cabecera de autenticación",
     });
   }
 
   // Limpiar el token y quitar las comillas si las hay
-  const token = req.headers.authorization.replace(/['"]+/g, '');
+  const token = req.headers.authorization.replace(/Bearer['"\s]+/g, "");
 
   // Decodificar el token y comprobar si ha expirado
   try {
@@ -24,20 +24,19 @@ export const ensureAuth = (req, res, next) => {
     if (payload.exp <= moment().unix()) {
       return res.status(401).send({
         status: "error",
-        message: "El token ha expirado"
+        message: "El token ha expirado",
       });
     }
 
     // Agregar los datos del user
     req.user = payload;
-
   } catch (error) {
     return res.status(404).send({
       status: "error",
-      message: "El token no es válido"
+      message: "El token no es válido",
     });
   }
 
   // Pasar a la ejecución del siguiente método
   next();
-}
+};

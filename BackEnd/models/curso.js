@@ -1,30 +1,29 @@
-// Añadir pluggin de paginación
-/*CursoSchema.plugin(mongoosePaginate);*/
-import { Schema, model} from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
+import { Schema, model } from "mongoose";
 
 const CursoSchema = Schema({
   id_usuario: {
     type: [Schema.ObjectId],
     ref: "User",
-    default: []
+    default: [],
   },
   titulo: {
     type: String,
-    required: true
+    required: true,
   },
   categoria: {
-    type: String
+    type: String,
   },
   descripcion: {
     type: String,
-    required: true
+    required: true,
   },
   duracion: {
-    type: String
+    type: String,
   },
   imagen: {
     type: String,
-    required: true
+    required: true,
   },
   created_at: {
     type: Date,
@@ -32,5 +31,7 @@ const CursoSchema = Schema({
   },
 });
 
-export default model("Curso", CursoSchema, "curso");
+// Añadir pluggin de paginación
+CursoSchema.plugin(mongoosePaginate);
 
+export default model("Curso", CursoSchema, "curso");
