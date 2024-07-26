@@ -1,5 +1,8 @@
 import Curso from "../models/curso.js"
+import fs from 'fs';
+import path from 'path';
 
+const extensionsFile = ["png", "jpg", "jpeg", "gif"];
 
 // Método para hacer una publicación
 export const saveCurso = async (req, res) => {
@@ -234,6 +237,91 @@ export const getCursos = async (req, res)=>{
     return res.status(500).send({
       status: "error",
       message: "Error al obtener los cursos",
+    });
+  }
+}
+
+export const uploadFile = async (req, res) =>{
+  try{
+    if(!req.file) return res.status(400).json({
+          status: 'Error',
+          msg: "NO hay archivo para cargar",
+      });
+
+    let img = req.file;
+    const { originalname, mimetype, size, filename, path } = img;
+    const { id } = req.params;
+
+    const isExtensionPermited = extensionsFile.some((extension) =>
+        extension.includes(mimetype.split("/")[1].toLowerCase()),
+    );
+
+    if (!isExtensionPermited) {
+        fs.unlinkSync(path);
+
+        return res.status(400).json({
+            status: ERROR,
+            msg: "Extension no permitida",
+        });
+    }
+
+    const cursoUpdate = await Curso.findOneAndUpdate(
+        { _id: id },
+        { imagen: filename },
+        { new: true },
+    );
+
+    if (!cursoUpdate) {
+        fs.unlinkSync(path);
+
+        return res.status(400).json({
+            status: ERROR,
+            msg: "No se actualizo el archivo",
+        });
+    }
+
+    return res.status(200).json({
+      status: 'succes',
+      file: req.file,
+      object: cursoUpdate,
+    });
+    
+  }catch(e){
+    console.log("Error al cargar imagen al curso", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al cargar imagen al curso",
+    });
+  }
+}
+
+export const getFile = async (req, res)=>{
+  try{
+    if (!req.params.nameFile)
+      return res.status(400).json({
+          status: ERROR,
+          msg: "No hay un nombre de archivo para consultar",
+      });
+
+    const { nameFile } = req.params;
+    const filePath = `./uploads/${nameFile}`;
+
+    fs.stat(filePath, (error, stats) => {
+        if (error)
+            return res.status(400).json({
+                status: ERROR,
+                msg: "El archivo no existe",
+            });
+
+        res.status(200).sendFile(path.resolve(filePath));
+        return;
+    });
+    
+  }catch(e){
+    console.log("Error al cargar imagen al curso", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al cargar imagen al curso",
     });
   }
 }
