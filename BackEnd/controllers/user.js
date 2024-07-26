@@ -1,15 +1,15 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../services/jwt.js";
-import {RoleService} from "../services/role.service.js";
 
 // Método para Registrar de usuarios
 export const register = async (req, res) => {
   try {
     // Recoger datos de la petición
     let params = req.body;
-    let { role } = req.params;
-    console.log("ROLE ", role);
+
+    /*let { role } = req.params;
+    console.log("ROLE ", role);*/
 
     // Validaciones: verificamos que los datos obligatorios estén presentes
     if (
@@ -18,6 +18,8 @@ export const register = async (req, res) => {
       !params.last_name ||
       !params.telefono ||
       !params.email ||
+      !params.rol ||
+      !params.estado ||
       !params.password
     ) {
       return res.status(400).json({
@@ -27,15 +29,28 @@ export const register = async (req, res) => {
     }
 
     // Desestructurar datos de usuario
-    const { cedula, name, last_name, telefono, email, password, ...newRole } = params;
-    
+    const {
+      cedula,
+      name,
+      last_name,
+      telefono,
+      email,
+      rol,
+      password,
+      estado,
+      id_curso,
+    } = params;
+
     const userData = {
       cedula: cedula,
       name: name,
       last_name: last_name,
       telefono: telefono,
       email: email,
+      rol: rol,
       password: password,
+      estado: estado,
+      id_curso: id_curso,
     };
 
     // Crear una instancia del modelo User con los datos validados
@@ -65,11 +80,6 @@ export const register = async (req, res) => {
     // Guardar el usuario en la base de datos
     await user_to_save.save();
 
-    // Crear rol
-    newRole.id_user = user_to_save.id;
-
-    const roleSave = await RoleService.createRole(role, newRole);
-
     // Devolver respuesta exitosa y el usuario registrado
     return res.status(201).json({
       status: "created",
@@ -79,8 +89,8 @@ export const register = async (req, res) => {
         name: user_to_save.name,
         last_name: user_to_save.last_name,
         cedula: user_to_save.cedula,
+        rol: user_to_save.rol,
       },
-      role: roleSave,
     });
   } catch (error) {
     console.log("Error en registro de usuario:", error);
@@ -116,6 +126,14 @@ export const login = async (req, res) => {
       });
     }
 
+    //Si esta inactivo
+    if (user.estado === "inactivo") {
+      return res.status(404).json({
+        status: "error",
+        message: "El usuario no esta activo",
+      });
+    }
+
     // Comprobar si el password recibido es igual al que está almacenado en la BD
     const validPassword = await bcrypt.compare(params.password, user.password);
 
@@ -127,7 +145,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const role = await RoleService.findRole(user.id);
+    //const role = await RoleService.findRole(user.id);
 
     // Generar token de autenticación
     const token = createToken(user);
@@ -144,8 +162,8 @@ export const login = async (req, res) => {
         telefono: user.telefono,
         email: user.email,
         cedula: user.cedula,
+        rol: user.rol || "estudiante",
         created_at: user.created_at,
-        role: role.isEstudiante || role.isSupervisor,
       },
     });
   } catch (error) {
@@ -164,16 +182,16 @@ export const profile = async (req, res) => {
     const userId = req.params.id;
 
     // Verificar si el ID recibido del usuario autenticado existe
-    if (!req.user || !req.user.userId) {
+    /*if (!req.user || !req.user.userId) {
       return res.status(404).send({
         status: "error",
         message: "Usuario no autenticado",
       });
-    }
+    }*/
 
     // Buscar al usuario en la BD, excluimos la contraseña, rol, versión.
     const userProfile = await User.findById(userId).select(
-      "-password -role -__v -email",
+      "-password -rol -__v -email",
     );
 
     // Verificar si el usuario existe
@@ -194,7 +212,7 @@ export const profile = async (req, res) => {
       followInfo,
     });
   } catch (error) {
-    console.log("Error al botener el perfil del usuario:", error);
+    console.log("Error al obtener el perfil del usuario:", error);
     return res.status(500).send({
       status: "error",
       message: "Error al obtener el perfil del usuario",
@@ -206,7 +224,7 @@ export const profile = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     // Recoger información del usuario a actualizar
-    let userIdentity = req.user;
+    let {id} = req.params;
     let userToUpdate = req.body;
 
     // Validar que los campos necesarios estén presentes
@@ -218,8 +236,8 @@ export const updateUser = async (req, res) => {
     }
 
     // Eliminar campos sobrantes
-    delete userToUpdate.iat;
-    delete userToUpdate.exp;
+    //delete userToUpdate.iat;
+    //delete userToUpdate.exp;
 
     // Comprobar si el usuario ya existe
     const users = await User.find({
@@ -231,7 +249,7 @@ export const updateUser = async (req, res) => {
 
     // Verificar si el usuario está duplicado y evitar conflicto
     const isDuplicateUser = users.some((user) => {
-      return user && user._id.toString() !== userIdentity.userId;
+      return user && user._id.toString() !== id;
     });
 
     if (isDuplicateUser) {
@@ -240,8 +258,6 @@ export const updateUser = async (req, res) => {
         message: "Solo se puede modificar los datos del usuario logueado.",
       });
     }
-
-    //Verificar Rol de usuaio
 
     // Cifrar la contraseña si se proporciona
     if (userToUpdate.password) {
@@ -260,7 +276,7 @@ export const updateUser = async (req, res) => {
 
     // Buscar y Actualizar el usuario a modificar en la BD
     let userUpdated = await User.findByIdAndUpdate(
-      userIdentity.userId,
+      id,
       userToUpdate,
       { new: true },
     );
@@ -276,7 +292,7 @@ export const updateUser = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "¡Usuario actualizado correctamente!",
-      user: userUpdated,
+      object: userUpdated,
     });
   } catch (error) {
     console.log("Error al actualizar los datos del usuario", error);
@@ -286,6 +302,56 @@ export const updateUser = async (req, res) => {
     });
   }
 };
+
+//metodo para devolver listado de usuarios
+export const listUsers = async (req, res) =>{
+  try{
+    let {page} = req.params || 1;
+    let {limit} = req.query || 10;
+
+    let options = {
+      page,
+      limit,
+      select: ['-password', '-__v'],
+      populate: {
+        path: 'id_curso',
+        select: '-__v, '
+      },
+      lean: true
+    }
+    
+    let users = await User.paginate({}, options);
+
+    if (!users || users.docs.length <= 0) {
+        res.status(200).json({
+            status: SUCCESS,
+            msg: "No hay usuarios disponibles",
+        });
+        return;
+    }
+
+    res.status(200).json({
+        status: 'success',
+        object: users.docs,
+        totalDocs: users.totalDocs,
+        totalPages: users.totalPages,
+        page: users.page,
+        pagingCounter: users.pagingCounter,
+        hasPrevPage: users.hasPrevPage,
+        hasNextPage: users.hasNextPage,
+        prevPage: users.prevPage,
+        nextPage: users.nextPage,
+        limit: users.limit,
+    });
+    
+  }catch(error){
+    console.log("Error al listar los usuarios", error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al listar los usuarios",
+    });
+  }
+}
 
 // Método guardar progreso del usuario
 /*export const counters = async (req, res) => {
