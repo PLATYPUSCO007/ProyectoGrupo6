@@ -20,3 +20,9 @@ export interface ResponseCreate {
     message: string;
     object:    User | Curso;
 }
+
+export interface ResponseFile {
+    status:  string;
+    file: string;
+    object: Curso;
+}

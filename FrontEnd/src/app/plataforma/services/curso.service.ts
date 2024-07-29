@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environments } from '../../../environments/environments';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 import { Curso } from '../../interfaces/Curso.interface';
-import { ResponseCreate, ResponsePaginate } from '../../interfaces/Responses.interface';
+import { ResponseCreate, ResponseFile, ResponsePaginate } from '../../interfaces/Responses.interface';
 import { LoginService } from '../../login/services/loginService/login.service';
 
 @Injectable({
@@ -51,6 +51,25 @@ export class CursoService {
           console.error(e);
           return throwError('Error al actualizar el cursos.');
         })
+      )
+  }
+
+  getImgCurso(nameFile: string): Observable<Blob>{
+    return this.http.get(`${this.URL_BASE}api/curso/file/${nameFile}`, { responseType: 'blob' })
+      .pipe(
+        catchError((e)=>{
+          console.error(e);
+          return throwError('Error al obtener la imagen');
+        })
+      )
+  }
+
+  upImgCurso(idCurso: string, file: File): Observable<Curso>{
+    let formData = new FormData();
+    formData.append('file0', file);
+    return this.http.post<ResponseFile>(`${this.URL_BASE}api/curso/file/${idCurso}`, formData)
+      .pipe(
+        map((response)=>response.object)
       )
   }
 

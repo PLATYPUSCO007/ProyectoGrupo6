@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CategoriasCurso, Curso } from '../../../../interfaces/Curso.interface';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CursoService } from '../../../services/curso.service';
-import { switchMap } from 'rxjs';
+import { of, switchMap, tap } from 'rxjs';
+import { Estado, User } from '../../../../interfaces/Roles.interface';
 
 @Component({
   selector: 'app-cursos',
@@ -12,8 +13,8 @@ import { switchMap } from 'rxjs';
 export class CursosComponent implements OnInit{
 
   public isCreate = signal<boolean>(true);
-  public tempImg = signal<string | ArrayBuffer>('');
-  public eventFile = signal<any>('');
+  public imgToLoad: File | null = null;
+  public eventFile = signal<Event | null>(null);
 
   public listCategorias: CategoriasCurso[] = [
     CategoriasCurso['BASE DE DATOS'],
@@ -35,6 +36,15 @@ export class CursosComponent implements OnInit{
   })
 
   private cursoService = inject(CursoService);
+  public setValueImg = effect(()=>{
+    if (!this.eventFile()) {
+      return;
+    }
+    const input = this.eventFile()!.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.imgToLoad = input.files![0];
+    }
+  })
 
   get listCursos(): Curso[]{
     return this.cursoService.listOfCursos;
@@ -44,11 +54,25 @@ export class CursosComponent implements OnInit{
     this.getCursos();
   }
 
+  getFiles(){
+    this.listCursos.forEach((curso)=>{
+      this.cursoService.getImgCurso(curso.imagen)
+        .subscribe({
+          next: (img)=>{
+            curso.imagen = URL.createObjectURL(img);
+          },
+          error: (e)=>{
+            console.log(e);
+          }    
+        })
+    })
+  }
+
   getCursos(){
     this.cursoService.getCursos()
       .subscribe({
         next: (result)=>{
-          console.log(result);
+          this.getFiles();
         },
         error: (e)=>{
           console.error(e);
@@ -62,16 +86,19 @@ export class CursosComponent implements OnInit{
 
   crearCurso(){
     if (this.formCursos.invalid) return;
-    console.log(this.formCursos.value);
     this.cursoService.postCurso(this.formCursos.value)
       .pipe(
+        tap((curso)=>console.log(curso)),
+        switchMap((curso)=> {
+          return (this.imgToLoad) ? this.cursoService.upImgCurso(curso.id!, this.imgToLoad) : of('');
+        }),
         switchMap(()=>this.cursoService.getCursos())
       )
       .subscribe({
         next: (curso)=>{
-          console.log(curso);
           this.formCursos.reset();
           this.formCursos.get('categoria')?.setValue('');
+          this.getFiles();
         },
         error: (e)=>{
           console.log(e);
@@ -91,13 +118,18 @@ export class CursosComponent implements OnInit{
     if (this.formCursos.invalid) return;
     this.cursoService.updateCursos(this.formCursos.value)
       .pipe(
+        tap(()=>console.log(this.formCursos.get('imagen'))),
+        switchMap(()=> {
+          return (this.imgToLoad) ? this.cursoService.upImgCurso(this.formCursos.get('id')!.value, this.imgToLoad) : of('');
+        }),
         switchMap(()=>this.cursoService.getCursos())
       ).subscribe({
         next: (result)=>{
-          console.log(result);
+          this.getFiles();
           this.isCreate.update(()=>true);
           this.formCursos.reset();
           this.formCursos.get('categoria')?.setValue('');
+          this.imgToLoad = null;
         },
         error: (e)=>{
           console.log(e);

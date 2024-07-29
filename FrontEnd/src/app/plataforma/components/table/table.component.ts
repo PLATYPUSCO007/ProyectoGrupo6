@@ -16,8 +16,15 @@ export class TableComponent {
   @Output()
   objectEdit: EventEmitter<any> = new EventEmitter();
 
+  @Output()
+  statusRegister: EventEmitter<any> = new EventEmitter();
+
   sendValueEdit(val: any){
     this.objectEdit.emit(val);
+  }
+
+  changeStatus(UserStatus: any){    
+    this.statusRegister.emit(UserStatus);
   }
 
 }

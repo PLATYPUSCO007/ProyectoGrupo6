@@ -22,7 +22,7 @@
                     (change)="cargaImg($event)">
                 <div class="d-flex w-100 justify-content-center mt-3">
                     <div class="d-flex justify-content-center w-50">
-                        <app-img-load [eventImg]="eventFile()" [isShow]="formCursos.get('imagen')?.value"/>
+                        <app-img-load [eventImg]="eventFile()" [isShow]="!!imgToLoad"/>
                     </div>
                 </div>
                 <button class="btn btn-success w-75 mt-3" (click)="crearCurso()" *ngIf="isCreate(); else edit">Crear</button>

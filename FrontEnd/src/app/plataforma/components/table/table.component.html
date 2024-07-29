@@ -18,15 +18,19 @@
             <tr *ngFor="let val of listArray; let i=index">
                 <td>{{i+1}}</td>
                 <td *ngFor="let key of keys">
-                    <img *ngIf="key === 'imagen'; else row" [src]="val[key]" class="img-fluid rounded" alt="imagen curso" loading="lazy">
+                    <img *ngIf="key === 'imagen'; else row" [src]="val[key]" class="img-fluid rounded" width="100px" height="100px" alt="imagen curso" loading="lazy">
                     <ng-template #row>
-                        {{val[key]}} <span *ngIf="key === 'duracion'">min</span>
+                        <div *ngIf="key !== 'estado'">
+                            {{val[key]}} <span *ngIf="key === 'duracion'">min</span>
+                        </div>
+                        <div *ngIf="key === 'estado'" class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" [checked]="val[key] === 'activo'" (click)="changeStatus(val)">
+                        </div>
                     </ng-template>
                 </td>
                 <td>
                     <div class="d-flex">
                         <button class="btn btn-primary me-1" (click)="sendValueEdit(val)"><i class="bi bi-pencil-fill"></i></button>
-                        <button class="btn btn-danger"><i class="bi bi-x-circle-fill"></i></button>
                     </div>
                 </td>
             </tr>

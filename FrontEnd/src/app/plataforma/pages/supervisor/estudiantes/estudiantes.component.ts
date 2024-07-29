@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { User, Estado, Rol } from '../../../../interfaces/Roles.interface';
 import { UserService } from '../../../services/user.service';
-import { switchMap } from 'rxjs';
+import { switchMap, tap } from 'rxjs';
 
 
 @Component({
@@ -55,6 +55,9 @@ export class EstudiantesComponent implements OnInit {
 
   getListUsers(){
     this.userService.getUsers()
+      .pipe(
+        tap((users)=>this.setTempUsersList(users))
+      )
       .subscribe({
         next: (users)=>{
           this.userService.listUser = users;
@@ -72,13 +75,15 @@ export class EstudiantesComponent implements OnInit {
 
     this.userService.createUser(user)
       .pipe(
-        switchMap(()=>this.userService.getUsers())
+        switchMap(()=>this.userService.getUsers()),
+        tap((users)=>this.setTempUsersList(users))
       ).subscribe({
         next: (users)=>{
           this.resetForm();
           this.userService.listUser = users;
         },
         error: (e)=>{
+          this.userService.listUser = this.getTempUsersList();
           console.log(e);
         }
       })
@@ -88,7 +93,8 @@ export class EstudiantesComponent implements OnInit {
     if (this.formUser.invalid) return;
     this.userService.updateUser(this.formUser.value)
       .pipe(
-        switchMap(()=>this.userService.getUsers())
+        switchMap(()=>this.userService.getUsers()),
+        tap((users)=>this.setTempUsersList(users))
       ).subscribe({
         next: (users)=>{
           this.userService.listUser = users;
@@ -96,6 +102,7 @@ export class EstudiantesComponent implements OnInit {
           this.resetForm();
         },
         error: (e)=>{
+          this.userService.listUser = this.getTempUsersList();
           console.error(e);
         }
       })
@@ -108,11 +115,37 @@ export class EstudiantesComponent implements OnInit {
     this.isEdit.update(()=>true);
   }
 
-  deleteUser(){
-    
+
+  updateStatus(user: User){
+    if (!user.estado) return;
+    user.estado = (user.estado === Estado.ACTIVO) ? Estado.INACTIVO : Estado.ACTIVO;
+    this.userService.updateUser(user)
+      .pipe(
+        switchMap(()=>this.userService.getUsers()),
+        tap((users)=>this.setTempUsersList(users))
+      ).subscribe({
+        next: (users)=>{
+          this.userService.listUser = users;
+        },
+        error: (e)=>{
+          this.userService.listUser = this.getTempUsersList();
+          console.error(e);
+        }
+      })
   }
 
   resetForm(){
     this.formUser.reset({'estado': '', 'rol': ''});
+  }
+
+  setTempUsersList(users: User[]){
+    if (users.length <= 0) return;
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  getTempUsersList(): User[]{
+    if (!localStorage.getItem('users')) return [];
+    const tempUsers = localStorage.getItem('users');
+    return JSON.parse(tempUsers!)
   }
 }
