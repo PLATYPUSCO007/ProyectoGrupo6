@@ -1,6 +1,6 @@
-import Curso from "../models/curso.js"
-import fs from 'fs';
-import path from 'path';
+import Curso from "../models/curso.js";
+import fs from "fs";
+import path from "path";
 
 const extensionsFile = ["png", "jpg", "jpeg", "gif"];
 
@@ -10,37 +10,33 @@ export const saveCurso = async (req, res) => {
     // Obtener datos del body
     const params = req.body;
 
-   // Verificar que llegue desde el body el parámetro text con su información
-      if (
-        !params.titulo ||
-        !params.descripcion 
-          ) {
-            return res.status(400).json({
-              status: "error",
-              message: "Faltan datos por crear el curso",
-            });
-          }
+    // Verificar que llegue desde el body el parámetro text con su información
+    if (!params.titulo || !params.descripcion) {
+      return res.status(400).json({
+        status: "error",
+        message: "Faltan datos por crear el curso",
+      });
+    }
 
-     // Desestructurar datos de usuario
-     const { id_usuario, titulo, categoria, descripcion, duracion, imagen } = params;
-      
-     const cursoData = {
-       id_usuario: id_usuario,
-       titulo: titulo,
-       categoria: categoria,
-       descripcion: descripcion,
-       duracion: duracion,
-       imagen: imagen
-     };
+    // Desestructurar datos de usuario
+    const { id_usuario, titulo, categoria, descripcion, duracion, imagen } =
+      params;
 
-    // Crear objeto 
+    const cursoData = {
+      id_usuario: id_usuario,
+      titulo: titulo,
+      categoria: categoria,
+      descripcion: descripcion,
+      duracion: duracion,
+      imagen: imagen,
+    };
+
+    // Crear objeto
     let newCurso = new Curso(cursoData);
 
     // Buscar si ya existe un usuario con el mismo email o nick
     const existingCurso = await Curso.findOne({
-      $or: [
-        { titulo: newCurso.titulo.toLowerCase() }
-      ],
+      $or: [{ titulo: newCurso.titulo.toLowerCase() }],
     });
 
     // Si encuentra un usuario, devuelve un mensaje indicando que ya existe
@@ -53,12 +49,12 @@ export const saveCurso = async (req, res) => {
 
     // Guardar el curso en la base de datos
     await newCurso.save();
-    
+
     // Verificar si se guardó correctamente en la BD
-    if(!newCurso) {
+    if (!newCurso) {
       return res.status(500).send({
         status: "error",
-        message: "No se ha podido guardar el curso."
+        message: "No se ha podido guardar el curso.",
       });
     }
 
@@ -66,24 +62,23 @@ export const saveCurso = async (req, res) => {
     return res.status(201).json({
       status: "created",
       message: "Curso agregado con éxito",
-      user: {
+      object: {
         id: newCurso.id,
         titulo: newCurso.titulo,
         categoria: newCurso.categoria,
         descripcion: newCurso.descripcion,
         duracion: newCurso.duracion,
-        imagen: newCurso.imagen
+        imagen: newCurso.imagen,
       },
     });
-
   } catch (error) {
     console.log("Error al crear la publicación:", error);
     return res.status(500).send({
       status: "error",
-      message: "Error al crear el curso" 
+      message: "Error al crear el curso",
     });
   }
-}
+};
 
 export const updateCurso = async (req, res) => {
   try {
@@ -113,11 +108,9 @@ export const updateCurso = async (req, res) => {
     */
 
     // Buscar y Actualizar el curso a modificar en la BD
-    let cursoUpdated = await Curso.findByIdAndUpdate(
-      cursoId,
-      cursoToUpdate,
-      { new: true },
-    );
+    let cursoUpdated = await Curso.findByIdAndUpdate(cursoId, cursoToUpdate, {
+      new: true,
+    });
 
     if (!cursoUpdated) {
       return res.status(400).send({
@@ -145,7 +138,7 @@ export const addUserToCurso = async (req, res) => {
   try {
     // Obtener el ID del curso desde los parámetros de la URL
     let cursoId = req.params.id;
-    
+
     // Obtener el ID del usuario desde el cuerpo de la solicitud
     let { id_usuario } = req.body;
 
@@ -197,41 +190,40 @@ export const addUserToCurso = async (req, res) => {
   }
 };
 
-export const getCursos = async (req, res)=>{
+export const getCursos = async (req, res) => {
   try {
-    const {page} = req.params || 1;
-    const {limit} = req.query || 10;
+    const { page } = req.params || 1;
+    const { limit } = req.query || 10;
 
     const options = {
       page,
       limit,
-      select: ['-__v'],
-    }
+      select: ["-__v"],
+    };
 
     const cursos = await Curso.paginate({}, options);
-    
+
     if (!cursos || cursos.docs.length <= 0) {
-        res.status(200).json({
-            status: SUCCESS,
-            msg: "No hay cursos disponibles",
-        });
-        return;
+      res.status(200).json({
+        status: SUCCESS,
+        msg: "No hay cursos disponibles",
+      });
+      return;
     }
 
     res.status(200).json({
-        status: 'success',
-        object: cursos.docs,
-        totalDocs: cursos.totalDocs,
-        totalPages: cursos.totalPages,
-        page: cursos.page,
-        pagingCounter: cursos.pagingCounter,
-        hasPrevPage: cursos.hasPrevPage,
-        hasNextPage: cursos.hasNextPage,
-        prevPage: cursos.prevPage,
-        nextPage: cursos.nextPage,
-        limit: cursos.limit,
+      status: "success",
+      object: cursos.docs,
+      totalDocs: cursos.totalDocs,
+      totalPages: cursos.totalPages,
+      page: cursos.page,
+      pagingCounter: cursos.pagingCounter,
+      hasPrevPage: cursos.hasPrevPage,
+      hasNextPage: cursos.hasNextPage,
+      prevPage: cursos.prevPage,
+      nextPage: cursos.nextPage,
+      limit: cursos.limit,
     });
-    
   } catch (error) {
     console.log("Error al obtener los cursos", error);
     return res.status(500).send({
@@ -239,13 +231,14 @@ export const getCursos = async (req, res)=>{
       message: "Error al obtener los cursos",
     });
   }
-}
+};
 
-export const uploadFile = async (req, res) =>{
-  try{
-    if(!req.file) return res.status(400).json({
-          status: 'Error',
-          msg: "NO hay archivo para cargar",
+export const uploadFile = async (req, res) => {
+  try {
+    if (!req.file)
+      return res.status(400).json({
+        status: "Error",
+        msg: "NO hay archivo para cargar",
       });
 
     let img = req.file;
@@ -253,75 +246,73 @@ export const uploadFile = async (req, res) =>{
     const { id } = req.params;
 
     const isExtensionPermited = extensionsFile.some((extension) =>
-        extension.includes(mimetype.split("/")[1].toLowerCase()),
+      extension.includes(mimetype.split("/")[1].toLowerCase()),
     );
 
     if (!isExtensionPermited) {
-        fs.unlinkSync(path);
+      fs.unlinkSync(path);
 
-        return res.status(400).json({
-            status: ERROR,
-            msg: "Extension no permitida",
-        });
+      return res.status(400).json({
+        status: ERROR,
+        msg: "Extension no permitida",
+      });
     }
 
     const cursoUpdate = await Curso.findOneAndUpdate(
-        { _id: id },
-        { imagen: filename },
-        { new: true },
+      { _id: id },
+      { imagen: filename },
+      { new: true },
     );
 
     if (!cursoUpdate) {
-        fs.unlinkSync(path);
+      fs.unlinkSync(path);
 
-        return res.status(400).json({
-            status: ERROR,
-            msg: "No se actualizo el archivo",
-        });
+      return res.status(400).json({
+        status: ERROR,
+        msg: "No se actualizo el archivo",
+      });
     }
 
     return res.status(200).json({
-      status: 'succes',
+      status: "succes",
       file: req.file,
       object: cursoUpdate,
     });
-    
-  }catch(e){
+  } catch (e) {
     console.log("Error al cargar imagen al curso", error);
     return res.status(500).send({
       status: "error",
       message: "Error al cargar imagen al curso",
     });
   }
-}
+};
 
-export const getFile = async (req, res)=>{
-  try{
+export const getFile = async (req, res) => {
+  try {
     if (!req.params.nameFile)
       return res.status(400).json({
-          status: ERROR,
-          msg: "No hay un nombre de archivo para consultar",
+        status: ERROR,
+        msg: "No hay un nombre de archivo para consultar",
       });
 
     const { nameFile } = req.params;
     const filePath = `./uploads/${nameFile}`;
 
     fs.stat(filePath, (error, stats) => {
-        if (error)
-            return res.status(400).json({
-                status: ERROR,
-                msg: "El archivo no existe",
-            });
+      if (error)
+        return res.status(400).json({
+          status: "error",
+          msg: "El archivo no existe",
+        });
 
-        res.status(200).sendFile(path.resolve(filePath));
-        return;
+      res.status(200).sendFile(path.resolve(filePath));
+      return;
     });
-    
-  }catch(e){
+  } catch (e) {
     console.log("Error al cargar imagen al curso", error);
     return res.status(500).send({
       status: "error",
       message: "Error al cargar imagen al curso",
     });
   }
-}
+};
