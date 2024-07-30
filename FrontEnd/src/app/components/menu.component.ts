@@ -23,11 +23,13 @@ export class MenuComponent {
       route: 'cursos',
       title: 'Cursos',
       icon: 'bi bi bi-book-half me-3',
+      profile: 'estudiante'
     },
     {
       route: 'estudiantes',
       title: 'Estudiantes',
-      icon: 'bi bi-mortarboard-fill me-3'
+      icon: 'bi bi-mortarboard-fill me-3',
+      profile: 'supervisor'
     },
     {
       route: 'supervisor',
